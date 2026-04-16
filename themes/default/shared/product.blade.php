@@ -1,5 +1,8 @@
-<div class="product-wrap {{ request('style_list') ?? '' }}">
+<div class="product-wrap floral-product-card {{ request('style_list') ?? '' }}">
   <div class="image">
+    @if (($product['price'] ?? 0) != ($product['origin_price'] ?? 0) && ($product['origin_price'] ?? 0) > 0)
+      <span class="floral-badge-sale">{{ __('shop/mrhoa.badge_sale') }}</span>
+    @endif
     @hook('product_list.item.image.tag')
 
     <a href="{{ $product['url'] }}">

@@ -1,6 +1,6 @@
 @extends('admin::layouts.master')
 
-@section('title', __('admin/common.product'))
+@section('title', 'Sản phẩm')
 
 @section('content')
   @if ($errors->has('error'))
@@ -16,78 +16,51 @@
       <div class="card-body">
         <div class="bg-light p-4">
           <div class="row">
-            <div class="col-xxl-20 col-xl-3 col-lg-4 col-md-4 d-flex align-items-center mb-3">
-              <label class="filter-title">{{ __('product.name') }}</label>
+            <div class="col-xxl-20 col-xl-4 col-lg-5 col-md-6 d-flex align-items-center mb-3">
+              <label class="filter-title">Tên sản phẩm</label>
               <input @keyup.enter="search" type="text" v-model="filter.name" class="form-control"
-                     placeholder="{{ __('product.name') }}">
+                     placeholder="Tên sản phẩm">
             </div>
-            <div class="col-xxl-20 col-xl-3 col-lg-4 col-md-4 d-flex align-items-center mb-3">
-              <label class="filter-title">{{ __('product.sku') }}</label>
-              <input @keyup.enter="search" type="text" v-model="filter.sku" class="form-control"
-                     placeholder="{{ __('product.sku') }}">
-            </div>
-
-            <div class="col-xxl-20 col-xl-3 col-lg-4 col-md-4 d-flex align-items-center mb-3">
-              <label class="filter-title">{{ __('product.model') }}</label>
-              <input @keyup.enter="search" type="text" v-model="filter.model" class="form-control"
-                     placeholder="{{ __('product.model') }}">
-            </div>
-
-            <div class="col-xxl-20 col-xl-3 col-lg-4 col-md-4 d-flex align-items-center mb-3">
-              <label class="filter-title">{{ __('product.category') }}</label>
-              <select v-model="filter.category_id" class="form-select">
-                <option value="">{{ __('common.all') }}</option>
-                @foreach ($categories as $_category)
-                  <option :value="{{ $_category->id }}">{{ $_category->name }}</option>
-                @endforeach
-              </select>
-            </div>
-
-            <div class="col-xxl-20 col-xl-3 col-lg-4 col-md-4 d-flex align-items-center mb-3">
-              <label class="filter-title">{{ __('common.status') }}</label>
-              <select v-model="filter.active" class="form-select">
-                <option value="">{{ __('common.all') }}</option>
-                <option value="1">{{ __('product.active') }}</option>
-                <option value="0">{{ __('product.inactive') }}</option>
-              </select>
-            </div>
-
-            @hook('admin.product.list.filter')
           </div>
 
           <div class="row">
             <label class="filter-title"></label>
             <div class="col-auto">
               <button type="button" @click="search"
-                      class="btn btn-outline-primary btn-sm">{{ __('common.filter') }}</button>
+                      class="btn btn-outline-primary btn-sm">Lọc</button>
               <button type="button" @click="resetSearch"
-                      class="btn btn-outline-secondary btn-sm">{{ __('common.reset') }}</button>
+                      class="btn btn-outline-secondary btn-sm">Đặt lại</button>
             </div>
           </div>
         </div>
 
-        <div class="d-flex justify-content-between my-4">
+        <div class="d-flex justify-content-between my-4 flex-wrap gap-2">
           @if ($type != 'trashed')
             <a href="{{ admin_route('products.create') }}" class="me-1 nowrap">
-              <button class="btn btn-primary">{{ __('admin/product.products_create') }}</button>
+              <button class="btn btn-primary">Thêm sản phẩm</button>
             </a>
+            @if ($products->total())
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-outline-secondary" :disabled="!selectedIds.length"
+                        @click="batchDelete">Xóa đã chọn</button>
+                <button class="btn btn-outline-secondary" :disabled="!selectedIds.length"
+                        @click="batchActive(true)">Bật đã chọn</button>
+                <button class="btn btn-outline-secondary" :disabled="!selectedIds.length"
+                        @click="batchActive(false)">Tắt đã chọn</button>
+                @hook('admin.product.batch_btns.after')
+              </div>
+            @endif
           @else
             @if ($products->total())
-              <button class="btn btn-primary" @click="clearRestore">{{ __('admin/product.clear_restore') }}</button>
-            @endif
-          @endif
-
-          @if ($type != 'trashed' && $products->total())
-            <div class="right nowrap">
-              @hook('admin.product.batch_btns.before')
+                <button class="btn btn-primary" @click="clearRestore">Xóa vĩnh viễn</button>
               <button class="btn btn-outline-secondary" :disabled="!selectedIds.length"
-                      @click="batchDelete">{{ __('admin/product.batch_delete')  }}</button>
+                      @click="batchDelete">Xóa đã chọn</button>
               <button class="btn btn-outline-secondary" :disabled="!selectedIds.length"
-                      @click="batchActive(true)">{{ __('admin/product.batch_active') }}</button>
+                      @click="batchActive(true)">Bật đã chọn</button>
               <button class="btn btn-outline-secondary" :disabled="!selectedIds.length"
-                      @click="batchActive(false)">{{ __('admin/product.batch_inactive') }}</button>
+                      @click="batchActive(false)">Tắt đã chọn</button>
               @hook('admin.product.batch_btns.after')
-            </div>
+            @endif
           @endif
         </div>
 
@@ -97,35 +70,16 @@
               <thead>
               <tr>
                 <th><input type="checkbox" v-model="allSelected"/></th>
-                <th>{{ __('common.id') }}</th>
-                <th>{{ __('product.image') }}</th>
-                <th>{{ __('product.name') }}</th>
-                <th>{{ __('product.price') }}</th>
-                <th>{{ __('product.quantity') }}</th>
-                <th>
-                  <div class="d-flex align-items-center">
-                    {{ __('common.created_at') }}
-                    <div class="d-flex flex-column ml-1 order-by-wrap">
-                      <i class="el-icon-caret-top" @click="checkedOrderBy('created_at:asc')"></i>
-                      <i class="el-icon-caret-bottom" @click="checkedOrderBy('created_at:desc')"></i>
-                    </div>
-                  </div>
-                </th>
-
-                <th class="d-flex align-items-center">
-                  <div class="d-flex align-items-center">
-                    {{ __('common.sort_order') }}
-                    <div class="d-flex flex-column ml-1 order-by-wrap">
-                      <i class="el-icon-caret-top" @click="checkedOrderBy('position:asc')"></i>
-                      <i class="el-icon-caret-bottom" @click="checkedOrderBy('position:desc')"></i>
-                    </div>
-                  </div>
-                </th>
+                <th>ID</th>
+                <th>Ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Giá (VND)</th>
+                <th>Số lượng</th>
                 @if ($type != 'trashed')
-                  <th>{{ __('common.status') }}</th>
+                  <th>Trạng thái</th>
                 @endif
                 @hook('admin.product.list.column')
-                <th class="text-end">{{ __('common.action') }}</th>
+                <th class="text-end">Hành động</th>
               </tr>
               </thead>
               <tbody>
@@ -143,8 +97,6 @@
                   </td>
                   <td>{{ $product['price_formatted'] }}</td>
                   <td>{{ $product['quantity'] }}</td>
-                  <td>{{ $product['created_at'] }}</td>
-                  <td>{{ $product['position'] }}</td>
                   @if ($type != 'trashed')
                     <td>
                       <div class="form-check form-switch">
@@ -162,13 +114,13 @@
                   <td class="text-end text-nowrap">
                     @if ($product['deleted_at'] == '')
                       <a href="{{ admin_route('products.edit', [$product['id']]) }}"
-                         class="btn btn-outline-secondary btn-sm">{{ __('common.edit') }}</a>
+                         class="btn btn-outline-secondary btn-sm">Sửa</a>
                       <a href="javascript:void(0)" class="btn btn-outline-danger btn-sm"
-                         @click.prevent="deleteProduct({{ $loop->index }})">{{ __('common.delete') }}</a>
+                         @click.prevent="deleteProduct({{ $loop->index }})">Xóa</a>
                       @hook('admin.product.list.action', $product)
                     @else
                       <a href="javascript:void(0)" class="btn btn-outline-secondary btn-sm"
-                         @click.prevent="restoreProduct({{ $loop->index }})">{{ __('common.restore') }}</a>
+                         @click.prevent="restoreProduct({{ $loop->index }})">Khôi phục</a>
                       @hook('admin.products.trashed.action', $product)
                     @endif
                   </td>
@@ -240,9 +192,9 @@
         },
 
         batchDelete() {
-          this.$confirm('{{ __('admin/product.confirm_batch_product') }}', '{{ __('common.text_hint') }}', {
-            confirmButtonText: '{{ __('common.confirm') }}',
-            cancelButtonText: '{{ __('common.cancel') }}',
+          this.$confirm('Bạn có chắc chắn muốn xóa các sản phẩm đã chọn?', 'Lưu ý', {
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
             type: 'warning'
           }).then(() => {
             $http.delete('products/delete', {ids: this.selectedIds}).then((res) => {
@@ -254,9 +206,9 @@
         },
 
         batchActive(type) {
-          this.$confirm('{{ __('admin/product.confirm_batch_status') }}', '{{ __('common.text_hint') }}', {
-            confirmButtonText: '{{ __('common.confirm') }}',
-            cancelButtonText: '{{ __('common.cancel') }}',
+          this.$confirm('Bạn có chắc chắn muốn thay đổi trạng thái của sản phẩm đã chọn?', 'Lưu ý', {
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
             type: 'warning'
           }).then(() => {
             $http.post('products/status', {ids: this.selectedIds, status: type}).then((res) => {
@@ -286,7 +238,9 @@
         deleteProduct(index) {
           const id = this.productIds[index];
 
-          this.$confirm('{{ __('common.confirm_delete') }}', '{{ __('common.text_hint') }}', {
+          this.$confirm('Bạn có chắc chắn muốn xóa sản phẩm này?', 'Lưu ý', {
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
             type: 'warning'
           }).then(() => {
             $http.delete('products/' + id).then((res) => {
@@ -301,7 +255,9 @@
         restoreProduct(index) {
           const id = this.productIds[index];
 
-          this.$confirm('{{ __('admin/product.confirm_batch_restore') }}', '{{ __('common.text_hint') }}', {
+          this.$confirm('Bạn có chắc chắn muốn khôi phục sản phẩm này?', 'Lưu ý', {
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
             type: 'warning'
           }).then(() => {
             $http.put('products/restore', {id: id}).then((res) => {
@@ -313,7 +269,9 @@
         },
 
         clearRestore() {
-          this.$confirm('{{ __('admin/product.confirm_delete_restore') }}', '{{ __('common.text_hint') }}', {
+          this.$confirm('Bạn có chắc chắn muốn xóa vĩnh viễn các sản phẩm đã xóa?', 'Lưu ý', {
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
             type: 'warning'
           }).then(() => {
             $http.post('products/trashed/clear').then((res) => {

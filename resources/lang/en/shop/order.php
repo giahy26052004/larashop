@@ -11,8 +11,8 @@
  */
 
 return [
-    'invalid_order'      => 'Invalid order',
-    'confirm_order'      => 'Customer confirm received package',
-    'cancel_order'       => 'Customer cancel the order',
-    'order_already_paid' => 'The order already has been paid',
+    'invalid_order'      => 'Đơn hàng không hợp lệ',
+    'confirm_order'      => 'Khách hàng xác nhận đã nhận hàng',
+    'cancel_order'       => 'Khách hàng đã hủy đơn hàng',
+    'order_already_paid' => 'Đơn hàng đã được thanh toán',
 ];

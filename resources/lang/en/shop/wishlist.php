@@ -10,6 +10,6 @@
  */
 
 return [
-    'add_wishlist_success'    => 'Add to wishlist successfully',
-    'remove_wishlist_success' => 'Remove from wishlist successfully',
+    'add_wishlist_success'    => 'Đã thêm vào danh sách yêu thích',
+    'remove_wishlist_success' => 'Đã xóa khỏi danh sách yêu thích',
 ];

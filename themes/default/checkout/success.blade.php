@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('body-class', 'page-account-order-info')
+@section('body-class', 'page-account-order-info page-checkout-success')
 @section('title',  __('shop/checkout.checkout_success_title'))
 
 @section('content')
@@ -75,42 +75,44 @@
           <div class="card">
             <div class="card-header"><h5 class="card-title">{{ __('order.address_info') }}</h5></div>
             <div class="card-body">
-              <table class="table">
-                <thead class="">
-                  <tr>
-                    <th>{{ __('order.shipping_address') }}</th>
-                    <th>{{ __('order.payment_address') }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div>{{ __('address.name') }}：{{ $order->shipping_customer_name }} ({{ $order->shipping_telephone }})</div>
-                      <div>
-                        {{ __('address.address') }}：
-                        {{ $order->shipping_address_1 }}
-                        {{ $order->shipping_address_2 }}
-                        {{ $order->shipping_city }}
-                        {{ $order->shipping_zone }}
-                        {{ $order->shipping_country }}
-                      </div>
-                      <div>{{ __('address.post_code') }}：{{ $order->shipping_zipcode }}</div>
-                    </td>
-                    <td>
-                      <div>{{ __('address.name') }}：{{ $order->payment_customer_name }} ({{ $order->payment_telephone }})</div>
-                      <div>
-                        {{ __('address.address') }}：
-                        {{ $order->payment_address_1 }}
-                        {{ $order->payment_address_2 }}
-                        {{ $order->payment_city }}
-                        {{ $order->payment_zone }}
-                        {{ $order->payment_country }}
-                      </div>
-                      <div>{{ __('address.post_code') }}：{{ $order->payment_zipcode }}</div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-responsive checkout-success-address-wrap">
+                <table class="table table-sm mb-0 checkout-success-address-table">
+                  <thead>
+                    <tr>
+                      <th>{{ __('order.shipping_address') }}</th>
+                      <th>{{ __('order.payment_address') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div>{{ __('address.name') }}：{{ $order->shipping_customer_name }} ({{ $order->shipping_telephone }})</div>
+                        <div>
+                          {{ __('address.address') }}：
+                          {{ $order->shipping_address_1 }}
+                          {{ $order->shipping_address_2 }}
+                          {{ $order->shipping_city }}
+                          {{ $order->shipping_zone }}
+                          {{ $order->shipping_country }}
+                        </div>
+                        <div>{{ __('address.post_code') }}：{{ $order->shipping_zipcode }}</div>
+                      </td>
+                      <td>
+                        <div>{{ __('address.name') }}：{{ $order->payment_customer_name }} ({{ $order->payment_telephone }})</div>
+                        <div>
+                          {{ __('address.address') }}：
+                          {{ $order->payment_address_1 }}
+                          {{ $order->payment_address_2 }}
+                          {{ $order->payment_city }}
+                          {{ $order->payment_zone }}
+                          {{ $order->payment_country }}
+                        </div>
+                        <div>{{ __('address.post_code') }}：{{ $order->payment_zipcode }}</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
           @endhookwrapper

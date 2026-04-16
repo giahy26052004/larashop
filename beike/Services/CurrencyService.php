@@ -11,6 +11,7 @@
 
 namespace Beike\Services;
 
+use Beike\Models\Currency;
 use Beike\Repositories\CurrencyRepo;
 use Illuminate\Support\Facades\Http;
 
@@ -42,18 +43,21 @@ class CurrencyService
             return $amount;
         }
 
-        if (!isset($this->currencies[$currency])) {
-            throw (new \Exception("Currency {$currency} not exist. Please contact the administrator to create it"));
-        }
-
         $currencyRow = $this->currencies[$currency] ?? null;
         if (empty($currencyRow)) {
-            return $amount;
+            $currencyRow = Currency::query()->where('code', $currency)->first();
+        }
+        if (empty($currencyRow)) {
+            throw (new \Exception("Currency {$currency} not exist. Please contact the administrator to create it"));
         }
 
         $symbol_left   = $currencyRow->symbol_left;
         $symbol_right  = $currencyRow->symbol_right;
-        $decimal_place = $currencyRow->decimal_place;
+        $decimal_place = (int) $currencyRow->decimal_place;
+
+        if ($currencyRow->code === 'VND') {
+            $decimal_place = 0;
+        }
 
         if (! $value) {
             $value = $currencyRow->value;
@@ -61,7 +65,7 @@ class CurrencyService
 
         $amount = $value ? (float) $amount * $value : (float) $amount;
 
-        $amount = round($amount, (int) $decimal_place);
+        $amount = round($amount, $decimal_place);
 
         if (! $format) {
             return $amount;
@@ -76,7 +80,14 @@ class CurrencyService
             $string .= $symbol_left;
         }
 
-        $string .= number_format(abs($amount), (int) $decimal_place, __('currency.decimal_point'), __('currency.thousand_point'));
+        $decPoint = __('currency.decimal_point');
+        $thouSep  = __('currency.thousand_point');
+        if ($currencyRow->code === 'VND') {
+            $decPoint = ',';
+            $thouSep  = '.';
+        }
+
+        $string .= number_format(abs($amount), $decimal_place, $decPoint, $thouSep);
 
         if ($symbol_right) {
             $string .= ' ' . $symbol_right;
@@ -115,7 +126,7 @@ class CurrencyService
             sprintf(
                 'https://v6.exchangerate-api.com/v6/%s/latest/%s',
                 system_setting('base.rate_api_key'),
-                system_setting('base.currency', 'USD')
+                system_setting('base.currency', 'VND')
             )
         )->json();
         $rates = $data['conversion_rates'] ?? [];

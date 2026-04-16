@@ -84,53 +84,11 @@ class Sidebar extends Component
                 'children' => $this->getProductSubRoutes(),
             ],
             [
-                'route'    => 'customers.index',
-                'title'    => trans('admin/common.customer'),
-                'icon'     => 'bi bi-person-circle',
-                'prefixes' => $this->getCustomerSubPrefix(),
-                'children' => $this->getCustomerSubRoutes(),
-            ],
-            [
-                'route'    => 'pages.index',
-                'title'    => trans('admin/common.page'),
-                'icon'     => 'bi bi-file-earmark-text',
-                'prefixes' => $this->getPageSubPrefix(),
-                'children' => $this->getPageSubRoutes(),
-            ],
-            [
-                'route'    => 'reports_sale.index',
-                'title'    => trans('admin/common.report'),
-                'icon'     => 'bi bi-bar-chart-line',
-                'prefixes' => $this->getReportSubPrefix(),
-                'children' => $this->getReportSubRoutes(),
-            ],
-            [
-                'route'    => 'theme.index',
-                'title'    => trans('admin/common.design'),
-                'icon'     => 'bi bi-palette',
-                'prefixes' => $this->getDesignSubPrefix(),
-                'children' => $this->getDesignSubRoutes(),
-            ],
-            [
-                'route'    => 'plugins.index',
-                'title'    => trans('admin/common.plugin'),
-                'icon'     => 'bi bi-shop',
-                'prefixes' => $this->getPluginSubPrefix(),
-                'children' => $this->getPluginSubRoutes(),
-            ],
-            [
                 'route'    => 'settings.index',
                 'title'    => trans('admin/common.setting'),
                 'icon'     => 'bi bi-gear',
                 'prefixes' => $this->getSettingSubPrefix(),
                 'children' => $this->getSettingSubRoutes(),
-            ],
-            [
-                'route'    => 'help.index',
-                'title'    => trans('admin/common.help_index'),
-                'icon'     => 'bi bi-question-circle',
-                'prefixes' => ['help'],
-                'children' => [],
             ],
         ];
 
@@ -241,7 +199,7 @@ class Sidebar extends Component
      */
     private function getProductSubPrefix()
     {
-        $prefix = ['products', 'multi_filter', 'categories', 'brands', 'attribute_groups', 'attributes'];
+        $prefix = ['products', 'categories', 'attributes', 'attribute_groups', 'multi_filter'];
 
         return hook_filter('admin.sidebar.product.prefix', $prefix);
     }
@@ -261,7 +219,7 @@ class Sidebar extends Component
      */
     private function getOrderSubPrefix()
     {
-        $prefix = ['orders', 'rmas', 'rma_reasons'];
+        $prefix = ['orders'];
 
         return hook_filter('admin.sidebar.order.prefix', $prefix);
     }
@@ -335,13 +293,23 @@ class Sidebar extends Component
     public function getProductSubRoutes()
     {
         $routes = [
-            ['route' => 'products.index', 'prefixes' => ['products'], 'excludes' => ['products.trashed']],
+            ['route' => 'products.index', 'prefixes' => ['products']],
             ['route' => 'categories.index', 'prefixes' => ['categories']],
-            ['route' => 'brands.index', 'prefixes' => ['brands']],
-            ['route' => 'attribute_groups.index', 'prefixes' => ['attribute_groups']],
-            ['route' => 'attributes.index', 'prefixes' => ['attributes']],
-            ['route' => 'multi_filter.index', 'prefixes' => ['multi_filter']],
-            ['route' => 'products.trashed', 'prefixes' => ['products'], 'excludes' => ['products.index', 'products.edit', 'products.create']],
+            [
+                'route'    => 'attributes.index',
+                'prefixes' => ['attributes'],
+                'title'    => 'Tag lọc (thêm/sửa/xóa)',
+            ],
+            [
+                'route'    => 'attribute_groups.index',
+                'prefixes' => ['attribute_groups'],
+                'title'    => 'Nhóm thuộc tính',
+            ],
+            [
+                'route'    => 'multi_filter.index',
+                'prefixes' => ['multi_filter'],
+                'title'    => 'Bộ lọc nâng cao (tuỳ chọn)',
+            ],
         ];
 
         return hook_filter('admin.sidebar.product_routes', $routes);
@@ -367,10 +335,7 @@ class Sidebar extends Component
     public function getOrderSubRoutes()
     {
         $routes = [
-            ['route' => 'orders.index', 'prefixes' => ['orders'], 'excludes' => ['orders.trashed']],
-            ['route' => 'rmas.index', 'prefixes' => ['rmas']],
-            ['route' => 'rma_reasons.index', 'prefixes' => ['rma_reasons']],
-            ['route' => 'orders.trashed', 'prefixes' => ['orders'], 'excludes' => ['orders.index', 'orders.show']],
+            ['route' => 'orders.index', 'prefixes' => ['orders']],
         ];
 
         return hook_filter('admin.sidebar.order_routes', $routes);
@@ -455,14 +420,6 @@ class Sidebar extends Component
         $routes = [
             ['route' => 'settings.index', 'prefixes' => ['settings']],
             ['route' => 'account.index', 'prefixes' => ['account']],
-            ['route' => 'admin_users.index', 'prefixes' => ['admin_users', 'admin_roles']],
-            ['route' => 'regions.index', 'prefixes' => ['regions']],
-            ['route' => 'tax_rates.index', 'prefixes' => ['tax_rates']],
-            ['route' => 'tax_classes.index', 'prefixes' => ['tax_classes']],
-            ['route' => 'currencies.index', 'prefixes' => ['currencies']],
-            ['route' => 'languages.index', 'prefixes' => ['languages']],
-            ['route' => 'countries.index', 'prefixes' => ['countries']],
-            ['route' => 'zones.index', 'prefixes' => ['zones']],
         ];
 
         return hook_filter('admin.sidebar.setting_routes', $routes);

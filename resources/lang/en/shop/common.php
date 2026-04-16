@@ -10,12 +10,12 @@
  */
 
 return [
-    'home'            => 'Home',
-    'submit'          => 'Submit',
-    'cancel'          => 'Cancel',
-    'confirm'         => 'Confirm',
-    'no'              => 'No',
-    'yes'             => 'Yes',
-    'company_profile' => 'Company Profile',
-    'nginx_alert'     => 'Nginx server needs to configure pseudo-static rules, click <a href="https://docs.beikeshop.com/install/source.html#nginx" target="_blank">View configuration method</a>',
+    'home'            => 'Trang chủ',
+    'submit'          => 'Gửi',
+    'cancel'          => 'Hủy',
+    'confirm'         => 'Xác nhận',
+    'no'              => 'Không',
+    'yes'             => 'Có',
+    'company_profile' => 'Giới thiệu cửa hàng',
+    'nginx_alert'     => 'Máy chủ Nginx cần cấu hình rewrite (pseudo-static). Xem <a href="https://docs.beikeshop.com/install/source.html#nginx" target="_blank">hướng dẫn cấu hình</a>.',
 ];

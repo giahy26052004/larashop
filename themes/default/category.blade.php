@@ -1,6 +1,6 @@
 @extends('layout.master')
 @section('body-class', 'page-categories')
-@section('title', $category->description->meta_title ?: system_setting('base.meta_title', 'BeikeShop开源好用的跨境电商系统') .' - '. $category->description->name)
+@section('title', $category->description->meta_title ?: system_setting('base.meta_title', __('common.site_default_title')) .' - '. $category->description->name)
 @section('keywords', $category->description->meta_keywords ?: system_setting('base.meta_keyword'))
 @section('description', $category->description->meta_description ?: system_setting('base.meta_description'))
 
@@ -109,7 +109,10 @@
 
   function filterProductData() {
     let url = bk.removeURLParameters(window.location.href, 'attr', 'price', 'sort', 'order');
+    const normVndPrice = (v) => String(v ?? '').replace(/\D/g, '');
     let [psMin, psMax, pMin, pMax] = [$('.price-select-min').val(), $('.price-select-max').val(), $('.price-min').val(), $('.price-max').val()];
+    psMin = normVndPrice(psMin) || psMin;
+    psMax = normVndPrice(psMax) || psMax;
     let order = $('.order-select').val();
     let perpage = $('.perpage-select').val();
     let styleList = $('input[name="style_list"]:checked').val();

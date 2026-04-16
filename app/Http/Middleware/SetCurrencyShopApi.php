@@ -30,6 +30,13 @@ class SetCurrencyShopApi
             $currency = $request->get('currency');
         }
         $currency = $currency ?? system_setting('base.currency');
+        $enabled  = \Beike\Repositories\CurrencyRepo::listEnabled()->pluck('code')->toArray();
+        if (! in_array($currency, $enabled, true)) {
+            $currency = system_setting('base.currency');
+            if (! in_array($currency, $enabled, true)) {
+                $currency = $enabled[0] ?? 'VND';
+            }
+        }
         register('currency', $currency);
 
         return $next($request);

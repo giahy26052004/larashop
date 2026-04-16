@@ -3,7 +3,7 @@
     <div class="account-sides-info">
       <div class="mb-header d-md-none">
         <h5 class="mb-title mb-0">{{ __('shop/account.index') }}</h5>
-        <span class="btn-close" aria-label="Close"></span>
+        <span class="btn-close" aria-label="{{ __('common.close') }}"></span>
       </div>
       @hook('account.sidebar.before.head')
       <div class="head">

@@ -10,16 +10,16 @@
  */
 
 return [
-    'order_success'            => 'Congratulations, the order was successfully generated!',
-    'order_number'             => 'Order Number',
-    'amounts_payable'          => 'Amount ',
-    'payment_method'           => 'Payment Method ',
-    'view_order'               => 'View Order ',
-    'pay_now'                  => 'Pay Now ',
-    'kind_tips'                => 'Reminder: Your order has been successfully generated, please complete the payment as soon as possible~ ',
-    'also'                     => 'You can also',
-    'continue_purchase'        => 'continue to purchase',
-    'contact_customer_service' => 'If you have any questions during the order process, you can contact our customer service staff at any time',
+    'order_success'            => 'Chúc mừng, đơn hàng đã được tạo thành công!',
+    'order_number'             => 'Mã đơn hàng',
+    'amounts_payable'          => 'Số tiền',
+    'payment_method'           => 'Phương thức thanh toán',
+    'view_order'               => 'Xem đơn hàng',
+    'pay_now'                  => 'Thanh toán ngay',
+    'kind_tips'                => 'Nhắc nhở: Đơn hàng đã được tạo, vui lòng hoàn tất thanh toán sớm nhất có thể.',
+    'also'                     => 'Bạn cũng có thể',
+    'continue_purchase'        => 'tiếp tục mua sắm',
+    'contact_customer_service' => 'Nếu có thắc mắc trong quá trình đặt hàng, bạn có thể liên hệ bộ phận chăm sóc khách hàng bất cứ lúc nào',
     'emaill'                   => 'email',
-    'service_hotline'          => 'Service Hotline',
+    'service_hotline'          => 'Đường dây nóng',
 ];

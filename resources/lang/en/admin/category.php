@@ -10,14 +10,14 @@
  */
 
 return [
-    'index'             => 'Category',
-    'edit_category'     => 'Edit Category',
-    'parent_category'   => 'Parent Category',
-    'category_image'    => 'category image',
+    'index'             => 'Danh mục',
+    'edit_category'     => 'Sửa danh mục',
+    'parent_category'   => 'Danh mục cha',
+    'category_image'    => 'Ảnh danh mục',
 
-    'categories_index'  => 'Index',
-    'categories_create' => 'Create',
-    'categories_show'   => 'Detail',
-    'categories_update' => 'Edit',
-    'categories_delete' => 'Delete',
+    'categories_index'  => 'Danh sách',
+    'categories_create' => 'Thêm mới',
+    'categories_show'   => 'Chi tiết',
+    'categories_update' => 'Sửa',
+    'categories_delete' => 'Xóa',
 ];

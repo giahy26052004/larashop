@@ -1,0 +1,344 @@
+/**
+ * MrHoa — responsive pass: small screens, touch, safe areas, no horizontal scroll.
+ */
+
+/* ——— Global (theme) ——— */
+body.theme-mrhoa {
+  img,
+  video,
+  iframe,
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  table {
+    max-width: 100%;
+  }
+
+  .container,
+  .container-fluid {
+    @media (max-width: 575.98px) {
+      padding-left: max(0.75rem, env(safe-area-inset-left));
+      padding-right: max(0.75rem, env(safe-area-inset-right));
+    }
+  }
+
+  /* Rich text / CMS */
+  .page-content img,
+  #product-description iframe {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
+
+/* ——— Checkout ——— */
+body.theme-mrhoa.page-checkout {
+  @media (max-width: 991.98px) {
+    padding-bottom: max(5.5rem, calc(4.5rem + env(safe-area-inset-bottom)));
+  }
+
+  .card.shadow-sm .card-body,
+  .card.total-wrap {
+    @media (max-width: 575.98px) {
+      padding: 1rem !important;
+    }
+  }
+
+  input[type='datetime-local'].form-control {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .radio-line-wrap .radio-line-item {
+    @media (max-width: 575.98px) {
+      flex-wrap: wrap;
+      padding: 12px;
+      .left img {
+        max-height: 48px;
+        margin-left: 6px;
+      }
+    }
+  }
+
+  .submit-checkout-wrap {
+    @media (max-width: 991.98px) {
+      .form-check-label {
+        font-size: 0.88rem;
+        line-height: 1.4;
+      }
+    }
+  }
+}
+
+/* Element UI — địa chỉ trong dialog checkout */
+body.theme-mrhoa .address-dialog {
+  .mr-hoa-name-email-row {
+    gap: 0 1rem;
+
+    @media (max-width: 575.98px) {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .mr-hoa-form-item-name,
+    .mr-hoa-form-item-email {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
+  .mr-hoa-address-fields-row {
+    gap: 0 0.75rem;
+
+    @media (max-width: 991.98px) {
+      flex-direction: column !important;
+      gap: 0;
+    }
+
+    .mr-hoa-address-field {
+      flex: 1 1 0;
+      min-width: 0;
+      margin-bottom: 0;
+
+      @media (min-width: 992px) {
+        margin-left: 0 !important;
+      }
+    }
+
+    @media (min-width: 992px) {
+      .mr-hoa-address-field + .mr-hoa-address-field {
+        margin-left: 12px;
+      }
+    }
+  }
+
+  .el-dialog {
+    @media (max-width: 575.98px) {
+      width: 92vw !important;
+      margin-top: 5vh !important;
+    }
+  }
+}
+
+/* ——— Category / filter bar ——— */
+body.theme-mrhoa.page-categories {
+  .product-tool {
+    @media (max-width: 991.98px) {
+      flex-direction: column;
+      align-items: stretch !important;
+      gap: 0.65rem;
+
+      .right-per-page {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.5rem;
+        width: 100%;
+
+        > .text-nowrap {
+          white-space: normal !important;
+          font-size: 0.82rem;
+          line-height: 1.35;
+        }
+
+        > .d-flex.align-items-center {
+          width: 100%;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-left: 0 !important;
+
+          .form-select {
+            flex: 1 1 calc(50% - 0.25rem);
+            min-width: 0;
+            font-size: 0.85rem;
+          }
+        }
+      }
+    }
+  }
+
+  .filter-value-wrap .list-group-horizontal {
+    @media (max-width: 767.98px) {
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+  }
+
+  .left-column .x-fixed-top {
+    @media (max-width: 991.98px) {
+      width: min(100%, 22rem);
+      max-width: 92vw;
+    }
+  }
+}
+
+/* ——— Product listing grid ——— */
+body.theme-mrhoa.page-categories .product-grid {
+  @media (max-width: 575.98px) {
+    padding-left: calc(var(--bs-gutter-x) * 0.4);
+    padding-right: calc(var(--bs-gutter-x) * 0.4);
+  }
+}
+
+/* ——— Cart ——— */
+body.theme-mrhoa.page-cart {
+  .cart-products-wrap.table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 767.98px) {
+    .table {
+      font-size: 0.88rem;
+
+      th,
+      td {
+        padding: 0.45rem 0.35rem;
+      }
+    }
+  }
+}
+
+/* ——— Product detail ——— */
+body.theme-mrhoa.page-product {
+  .add-cart-btns,
+  .product-btns {
+    @media (max-width: 575.98px) {
+      flex-direction: column;
+      width: 100%;
+
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+}
+
+/* ——— Account (dashboard + các trang page-account-*) ——— */
+body.theme-mrhoa.page-account {
+  .card-items {
+    @media (max-width: 575.98px) {
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.75rem;
+
+      > a {
+        flex: 0 0 calc(50% - 0.5rem);
+      }
+    }
+  }
+
+  .account-card .card-header {
+    @media (max-width: 575.98px) {
+      flex-direction: column;
+      align-items: flex-start !important;
+      gap: 0.35rem;
+    }
+  }
+}
+
+body.theme-mrhoa[class*='page-account'] {
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ——— Home modules ——— */
+body.theme-mrhoa {
+  .mr-hoa-section-title {
+    @media (max-width: 575.98px) {
+      font-size: 1.45rem;
+      padding: 0 0.5rem;
+    }
+  }
+
+  .module-img-text-banner,
+  .module-image-plus img {
+    max-width: 100%;
+  }
+}
+
+/* ——— Header mobile ——— */
+body.theme-mrhoa .header-mobile .mobile-content .center {
+  @media (max-width: 400px) {
+    .mr-hoa-brand-tagline {
+      font-size: 0.65rem;
+      max-width: 42vw;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.2;
+    }
+  }
+}
+
+/* ——— Thanh toán đơn (sau checkout) ——— */
+body.theme-mrhoa.page-payment {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+
+  .order-info .table tbody tr:first-child td {
+    @media (max-width: 575.98px) {
+      display: block;
+      width: 100%;
+
+      &:first-child {
+        padding-bottom: 0.25rem;
+      }
+    }
+  }
+
+  .manual-transfer-payment {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+
+    img {
+      max-width: min(280px, 100%);
+      height: auto;
+    }
+  }
+}
+
+/* ——— Trang đặt hàng thành công (class thêm ở checkout/success) ——— */
+body.theme-mrhoa.page-checkout-success {
+  .checkout-success__header__title h1 {
+    @media (max-width: 575.98px) {
+      font-size: 1.35rem;
+      padding: 0 0.5rem;
+    }
+  }
+
+  .order-head .card-header {
+    @media (max-width: 575.98px) {
+      flex-direction: column;
+      align-items: stretch !important;
+      gap: 0.5rem;
+
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+
+  .checkout-success-address-wrap {
+    @media (max-width: 767.98px) {
+      .checkout-success-address-table thead {
+        display: none;
+      }
+
+      .checkout-success-address-table tbody td {
+        display: block;
+        width: 100%;
+        border: none;
+        padding: 0.75rem 0.5rem;
+      }
+
+      .checkout-success-address-table tbody td:first-child {
+        border-bottom: 1px solid rgba(42, 90, 74, 0.1);
+        padding-bottom: 1rem;
+      }
+
+      .checkout-success-address-table tbody td:last-child {
+        padding-top: 1rem;
+      }
+    }
+  }
+}

@@ -31,18 +31,25 @@
       </div>
     </div>
   </div>
-  <div class="cart-mb-total">
+  <div class="cart-mb-total flex-column align-items-stretch">
+    <div class="small text-muted mb-2 px-2">
+      <div class="d-flex justify-content-between"><span>{{ __('shop/carts.subtotal') }}</span><span>@{{ amount_format }}</span></div>
+      <div class="d-flex justify-content-between"><span>@{{ shipping_line_title }}</span><span>@{{ cart_shipping_estimate_format }}</span></div>
+      <div class="d-flex justify-content-between fw-bold mt-1 pt-1 border-top"><span>{{ __('shop/carts.order_total_estimated') }}</span><span>@{{ cart_grand_total_estimated_format }}</span></div>
+    </div>
+    <div class="d-flex w-100 justify-content-between align-items-center">
     <div class="left">
       <label for="check-all">
         <input class="form-check-input" type="checkbox" value="" id="check-all" v-model="allSelected"> {{ __('shop/carts.selected') }}(@{{ total_quantity }})
       </label>
     </div>
     <div class="right">
-      <span class="total-price fw-bold">@{{ amount_format }}</span>
+      <span class="total-price fw-bold">@{{ cart_grand_total_estimated_format }}</span>
       @hookwrapper('cart.confirm')
       <button type="button" class="btn btn-primary btn-checkout fs-5 fw-bold" @click="checkedBtnToCheckout">{{
         __('shop/carts.to_checkout') }}</button>
       @endhookwrapper
+    </div>
     </div>
   </div>
 </div>

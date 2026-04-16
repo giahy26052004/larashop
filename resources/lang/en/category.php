@@ -10,6 +10,6 @@
  */
 
 return [
-    'name'     => 'Name',
-    'children' => 'Subcategory',
+    'name'     => 'Tên',
+    'children' => 'Danh mục con',
 ];

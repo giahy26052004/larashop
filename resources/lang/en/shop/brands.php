@@ -10,5 +10,5 @@
  */
 
 return [
-    'index' => 'Brand List',
+    'index' => 'Thương hiệu',
 ];

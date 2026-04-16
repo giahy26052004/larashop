@@ -1,0 +1,10 @@
+{
+    "Page Expired": "Phiên làm việc đã hết hạn, vui lòng tải lại trang.",
+    "Pagination Navigation": "Điều hướng phân trang",
+    "Go to page :page": "Đến trang :page",
+    "Unauthorized": "Không được phép truy cập",
+    "Forbidden": "Truy cập bị từ chối",
+    "Service Unavailable": "Dịch vụ tạm thời không khả dụng",
+    "Too Many Requests": "Quá nhiều yêu cầu, vui lòng thử lại sau",
+    "Server Error": "Lỗi máy chủ"
+}

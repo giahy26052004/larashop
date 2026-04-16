@@ -112,7 +112,21 @@ class CheckoutService
         $customer                 = $this->customer;
         $checkoutData             = self::checkoutData();
         $checkoutData['customer'] = $customer;
-        $checkoutData['comment']  = request('comment');
+        $messageCard  = trim((string) request('message_card', ''));
+        $comment      = trim((string) request('comment', ''));
+        $deliveryTime = trim((string) request('delivery_time', ''));
+
+        $commentLines = [];
+        if ($messageCard !== '') {
+            $commentLines[] = 'Nội dung thông điệp: ' . $messageCard;
+        }
+        if ($deliveryTime !== '') {
+            $commentLines[] = 'Giờ giao mong muốn: ' . $deliveryTime;
+        }
+        if ($comment !== '') {
+            $commentLines[] = 'Ghi chú đơn hàng: ' . $comment;
+        }
+        $checkoutData['comment'] = implode("\n", $commentLines);
         $this->validateConfirm($checkoutData);
 
         try {
@@ -256,6 +270,9 @@ class CheckoutService
 
         $addresses        = AddressRepo::listByCustomer($customer);
         $payments         = PaymentMethodItem::collection(PluginRepo::getPaymentMethods())->jsonSerialize();
+        $payments         = $this->normalizeManualTransferMethods($payments);
+        $this->ensureCurrentPaymentMethod($payments);
+        $currentCart->refresh();
         $shipments        = ShippingMethodService::getShippingMethodsForCurrentCart($this);
         $shippingRequired = $this->shippingRequired();
         $this->setDefaultCurrentShippingMethod($shipments);
@@ -263,7 +280,15 @@ class CheckoutService
         $shippingQuote = ShippingMethodService::getCurrentQuote($shipments, $currentCart->shipping_method_code);
         $paymentMethod = PaymentMethodService::getCurrentMethod($payments, $currentCart->payment_method_code);
 
+        $transferNote = trim((string) system_setting('base.checkout_transfer_instructions', ''));
+        if ($transferNote === '') {
+            $transferNote = trans('shop/checkout.transfer_block_body');
+        }
+
         $data = [
+            'mrhoaShipNotice'       => trim((string) system_setting('base.cart_shipping_notice', '')),
+            'mrhoaShipCheckoutNote' => trim((string) system_setting('base.cart_shipping_checkout_note', '')),
+            'mrhoaCheckoutTransferText' => $transferNote,
             'current'          => [
                 'shipping_address_id'    => $shippingRequired ? $currentCart->shipping_address_id : 0,
                 'guest_shipping_address' => $shippingRequired ? $currentCart->guest_shipping_address : null,
@@ -272,7 +297,7 @@ class CheckoutService
                 'payment_address_id'     => $currentCart->payment_address_id,
                 'guest_payment_address'  => $currentCart->guest_payment_address,
                 'payment_method_code'    => $currentCart->payment_method_code,
-                'payment_method_name'    => $paymentMethod['name'] ?? '',
+                'payment_method_name'    => $paymentMethod['name'] ?? 'Thanh toán QR chuyển khoản',
                 'extra'                  => $currentCart->extra,
             ],
             'shipping_require' => $shippingRequired,
@@ -287,6 +312,32 @@ class CheckoutService
         ];
 
         return hook_filter('service.checkout.data', $data);
+    }
+
+    private function normalizeManualTransferMethods(array $payments): array
+    {
+        if (empty($payments)) {
+            return $payments;
+        }
+
+        $manualMethod        = $payments[0];
+        $manualMethod['name'] = 'Thanh toán QR chuyển khoản';
+        $manualMethod['description'] = 'Quét QR và chuyển khoản thủ công.';
+        $manualMethod['icon'] = asset('image/logo.png');
+
+        return [$manualMethod];
+    }
+
+    private function ensureCurrentPaymentMethod(array $payments): void
+    {
+        if (empty($payments)) {
+            return;
+        }
+
+        $codes = array_column($payments, 'code');
+        if (! in_array($this->cart->payment_method_code, $codes)) {
+            $this->updatePaymentMethod($payments[0]['code']);
+        }
     }
 
     private function setDefaultCurrentShippingMethod($shipments)
@@ -325,8 +376,13 @@ class CheckoutService
         if (! $address) {
             return [];
         }
-        $address['country'] = Country::find($address['country_id'])->name;
-        $address['zone']    = Zone::find($address['zone_id'])->name;
+        $address['country_id'] = (int) ($address['country_id'] ?? 0);
+        $address['zone_id']    = (int) ($address['zone_id'] ?? 0);
+
+        $country = Country::find($address['country_id']);
+        $zone    = Zone::find($address['zone_id']);
+        $address['country'] = $country->name ?? '';
+        $address['zone']    = $zone->name ?? '';
 
         return $address;
     }

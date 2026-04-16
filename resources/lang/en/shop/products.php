@@ -10,12 +10,12 @@
  */
 
 return [
-    'search'           => 'Search',
-    'add_to_favorites' => 'Add To Favorites',
-    'add_to_cart'      => 'Add To Cart',
-    'buy_now'          => 'Buy Now',
-    'product_details'  => 'Product Details',
-    'in_stock'         => 'In Stock',
-    'out_stock'        => 'Out Stock',
-    'model'            => 'Model',
+    'search'           => 'Tìm kiếm',
+    'add_to_favorites' => 'Yêu thích',
+    'add_to_cart'      => 'Thêm vào giỏ',
+    'buy_now'          => 'Mua ngay',
+    'product_details'  => 'Chi tiết sản phẩm',
+    'in_stock'         => 'Còn hàng',
+    'out_stock'        => 'Hết hàng',
+    'model'            => 'Mã SP',
 ];

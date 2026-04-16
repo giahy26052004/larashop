@@ -74,10 +74,21 @@ class DashboardRepo
      *
      * @return array
      */
+    /**
+     * Thống kê dashboard: gồm cả đơn chờ thanh toán (unpaid), không chỉ đơn đã thanh toán.
+     */
+    private static function dashboardOrderStatuses(): array
+    {
+        return array_values(array_unique(array_merge(
+            [StateMachineService::UNPAID],
+            StateMachineService::getValidStatuses()
+        )));
+    }
+
     public static function getOrderData(): array
     {
-        $today      = OrderRepo::getListBuilder(['statuses' => StateMachineService::getValidStatuses(), 'start' => today()->startOfDay(), 'end' => today()->endOfDay()])->count();
-        $yesterday  = OrderRepo::getListBuilder(['statuses' => StateMachineService::getValidStatuses(), 'start' => today()->subDay()->startOfDay(), 'end' => today()->subDay()->endOfDay()])->count();
+        $today      = OrderRepo::getListBuilder(['statuses' => self::dashboardOrderStatuses(), 'start' => today()->startOfDay(), 'end' => today()->endOfDay()])->count();
+        $yesterday  = OrderRepo::getListBuilder(['statuses' => self::dashboardOrderStatuses(), 'start' => today()->subDay()->startOfDay(), 'end' => today()->subDay()->endOfDay()])->count();
         $difference = $today - $yesterday;
         if ($yesterday) {
             $percentage = round(($difference / $yesterday) * 100);
@@ -126,8 +137,8 @@ class DashboardRepo
      */
     public static function getTotalData(): array
     {
-        $today      = OrderRepo::getListBuilder(['statuses' => StateMachineService::getValidStatuses(), 'start' => today()->startOfDay(), 'end' => today()->endOfDay()])->sum('total');
-        $yesterday  = OrderRepo::getListBuilder(['statuses' => StateMachineService::getValidStatuses(), 'start' => today()->subDay()->startOfDay(), 'end' => today()->subDay()->endOfDay()])->sum('total');
+        $today      = OrderRepo::getListBuilder(['statuses' => self::dashboardOrderStatuses(), 'start' => today()->startOfDay(), 'end' => today()->endOfDay()])->sum('total');
+        $yesterday  = OrderRepo::getListBuilder(['statuses' => self::dashboardOrderStatuses(), 'start' => today()->subDay()->startOfDay(), 'end' => today()->subDay()->endOfDay()])->sum('total');
         $difference = $today - $yesterday;
         if ($yesterday) {
             $percentage = round(($difference / $yesterday) * 100);

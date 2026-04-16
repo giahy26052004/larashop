@@ -8,14 +8,14 @@
     <base href="{{ $shop_base_url }}">
 
     <!-- Title and Meta Description -->
-    <title>@yield('title', system_setting('base.meta_title', 'BeikeShop开源好用的跨境电商系统'))</title>
+    <title>@yield('title', system_setting('base.meta_title', __('common.site_default_title')))</title>
     <meta name="keywords" content="@yield('keywords', system_setting('base.meta_keywords'))">
     <meta name="description" content="@yield('description', system_setting('base.meta_description'))">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:site_name" content="{{ system_setting('base.meta_title', 'BeikeShop') }}">
+    <meta property="og:site_name" content="{{ system_setting('base.meta_title', __('common.site_default_title')) }}">
     <meta property="og:url" content="{{ request()->url() }}">
-    <meta property="og:title" content="@yield('title', system_setting('base.meta_title', 'BeikeShop开源好用的跨境电商系统'))">
+    <meta property="og:title" content="@yield('title', system_setting('base.meta_title', __('common.site_default_title')))">
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:description" content="@yield('description', system_setting('base.meta_description'))">
     <meta property="og:image" content="@yield('og_image', image_origin(system_setting('base.logo')))">
@@ -25,16 +25,22 @@
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', system_setting('base.meta_title', 'BeikeShop开源好用的跨境电商系统'))">
+    <meta name="twitter:title" content="@yield('title', system_setting('base.meta_title', __('common.site_default_title')))">
     <meta name="twitter:description" content="@yield('description', system_setting('base.meta_description'))">
 
     <!-- Generator Meta -->
     <meta name="generator" content="BeikeShop v{{ config('beike.version') }}({{ config('beike.build') }})">
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ image_origin(system_setting('base.favicon')) }}">
+    <link rel="icon" href="{{ image_origin(system_setting('base.favicon')) }}?v={{ config('beike.build') }}" type="image/png">
+    <link rel="shortcut icon" href="{{ image_origin(system_setting('base.favicon')) }}?v={{ config('beike.build') }}">
+    <link rel="apple-touch-icon" href="{{ image_origin(system_setting('base.favicon')) }}?v={{ config('beike.build') }}">
 
     <!-- CSS and JS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" type="text/css" href="{{ mix('/build/beike/shop/'.system_setting('base.theme').'/css/bootstrap.css') }}">
     <script src="{{ asset('vendor/jquery/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('vendor/layer/3.5.1/layer.js') }}"></script>
@@ -50,7 +56,7 @@
     @hook('layout.header.code')
     @stack('header')
   </head>
-<body class="@yield('body-class') {{ request('_from') }}">
+<body class="@yield('body-class') theme-mrhoa {{ request('_from') }}">
   @if (!request('iframe') && request('_from') != 'app')
     @hook('layout.master.header.before')
     @include('layout.header')

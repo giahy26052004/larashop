@@ -19,11 +19,18 @@
   @if (locale() != 'zh_cn')
     <script src="{{ asset('vendor/element-ui/language/' . locale() . '.js') }}"></script>
   @endif
-  <link rel="shortcut icon" href="{{ image_origin(system_setting('base.favicon')) }}">
+  <link rel="icon" href="{{ image_origin(system_setting('base.favicon')) }}?v={{ config('beike.build') }}" type="image/png">
+  <link rel="shortcut icon" href="{{ image_origin(system_setting('base.favicon')) }}?v={{ config('beike.build') }}">
+  <link rel="apple-touch-icon" href="{{ image_origin(system_setting('base.favicon')) }}?v={{ config('beike.build') }}">
   <link href="{{ mix('build/beike/admin/css/app.css') }}" rel="stylesheet">
   <script src="{{ mix('build/beike/admin/js/app.js') }}"></script>
-  <title>BeikeShop - @yield('title')</title>
+  <title>{{ system_setting('base.meta_title', config('app.name', 'BeikeShop')) }} - @yield('title')</title>
   @stack('header')
+  <style>
+    .warning-copyright {
+      display: none !important;
+    }
+  </style>
 
   <script>
     const $languages = @json(locales());
@@ -57,11 +64,6 @@
         <div class="page-bottom-btns">
           @yield('page-bottom-btns')
         </div>
-
-        <p class="text-center text-secondary mt-5" id="copyright-text">
-            <a href="https://beikeshop.com/" class="ms-2" target="_blank">BeikeShop</a>
-            v{{ config('beike.version') }}({{ config('beike.build') }})
-            &copy; {{ date('Y') }} All Rights Reserved</p>
 
       </div>
 
@@ -115,6 +117,13 @@
     @endif
 
     @hook('admin.master.script.after')
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.warning-copyright').forEach(function (el) {
+        el.remove();
+      });
+    });
   </script>
 
   @stack('footer')

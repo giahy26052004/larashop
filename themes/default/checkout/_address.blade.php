@@ -22,7 +22,6 @@
                 <span class="name">@{{ address.name }}</span>
                 <span class="phone">@{{ address.phone }}</span>
               </div>
-              <div class="zipcode">@{{ address.zipcode }}</div>
               <div class="address-info">@{{ address.address_1 }} @{{ address.address_2 }} @{{ address.city }} @{{ address.zone }} @{{ address.country }}</div>
               @endhookwrapper
               @hook('checkout.address.shipping.item.bottom')
@@ -53,10 +52,7 @@
                 <span class="name">@{{ source.guest_shipping_address.name }}</span>
                 <span class="phone">@{{ source.guest_shipping_address.phone }}</span>
               </div>
-              <div class="zipcode">
-                <span>@{{ source.guest_shipping_address.zipcode }}</span>
-                <span class="ms-1">@{{ source.guest_shipping_address.email }}</span>
-              </div>
+              <div class="zipcode"><span>@{{ source.guest_shipping_address.email }}</span></div>
               <div class="address-info">@{{ source.guest_shipping_address.address_1 }} @{{ source.guest_shipping_address.address_2 }} @{{ source.guest_shipping_address.city }} @{{ source.guest_shipping_address.zone }} @{{ source.guest_shipping_address.country }}</div>
               @endhookwrapper
               <div class="address-bottom">
@@ -68,9 +64,13 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-6 col-12" v-if="!source.guest_shipping_address">
+          <div class="col-lg-6 col-12">
             <div class="item address-right">
-              <button class="btn btn-outline-dark w-100" @click="editAddress(null, 'guest_shipping_address')"><i
+              <button class="btn btn-outline-secondary w-100 mb-2" v-if="source.guest_shipping_address"
+                      @click="editAddress(null, 'guest_shipping_address')">
+                {{ __('shop/checkout.edit') }} địa chỉ
+              </button>
+              <button class="btn btn-outline-dark w-100" @click="newGuestAddress('guest_shipping_address')"><i
                   class="bi bi-plus-square-dotted"></i> {{ __('shop/checkout.add_new_address') }}</button>
             </div>
           </div>
@@ -100,7 +100,6 @@
                 <span class="name">@{{ address.name }}</span>
                 <span class="phone">@{{ address.phone }}</span>
               </div>
-              <div class="zipcode">@{{ address.zipcode }}</div>
               <div class="address-info">@{{ address.address_1 }} @{{ address.address_2 }} @{{ address.city }} @{{ address.zone }} @{{ address.country }}</div>
               @endhookwrapper
               @hook('checkout.address.payment.item.bottom')
@@ -131,7 +130,6 @@
                 <span class="name">@{{ source.guest_payment_address.name }}</span>
                 <span class="phone">@{{ source.guest_payment_address.phone }}</span>
               </div>
-              <div class="zipcode">@{{ source.guest_payment_address.zipcode }}</div>
               <div class="address-info">@{{ source.guest_payment_address.address_1 }} @{{ source.guest_payment_address.address_2 }} @{{ source.guest_payment_address.city }} @{{ source.guest_payment_address.zone }} @{{ source.guest_payment_address.country }}</div>
               @endhookwrapper
               <div class="address-bottom">
@@ -143,9 +141,13 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-6 col-12" v-if="!source.guest_payment_address">
+          <div class="col-lg-6 col-12">
             <div class="item address-right">
-              <button class="btn btn-outline-dark w-100" @click="editAddress(null, 'guest_payment_address')"><i
+              <button class="btn btn-outline-secondary w-100 mb-2" v-if="source.guest_payment_address"
+                      @click="editAddress(null, 'guest_payment_address')">
+                {{ __('shop/checkout.edit') }} địa chỉ
+              </button>
+              <button class="btn btn-outline-dark w-100" @click="newGuestAddress('guest_payment_address')"><i
                   class="bi bi-plus-square-dotted"></i> {{ __('shop/checkout.add_new_address') }}</button>
             </div>
           </div>
@@ -219,6 +221,31 @@
     },
 
     methods: {
+      normalizeAddressData(address) {
+        if (!address) return null;
+        if (typeof address === 'string') {
+          try {
+            address = JSON.parse(address);
+          } catch (e) {
+            return null;
+          }
+        }
+        if (typeof address !== 'object' || Array.isArray(address)) {
+          return null;
+        }
+        return address;
+      },
+
+      normalizeSourceAddresses() {
+        this.source.guest_shipping_address = this.normalizeAddressData(this.source.guest_shipping_address);
+        this.source.guest_payment_address  = this.normalizeAddressData(this.source.guest_payment_address);
+      },
+
+      newGuestAddress(type) {
+        this.source[type] = null
+        this.editAddress(null, type)
+      },
+
       editAddress(index, type) {
         let addresses = null
 
@@ -251,14 +278,16 @@
           }
 
           $http.put('/checkout', data).then((res) => {
+            const guestShipping = this.normalizeAddressData(res.current.guest_shipping_address);
+            const guestPayment  = this.normalizeAddressData(res.current.guest_payment_address);
             if (this.source.guest_payment_address === null && this.source.guest_shipping_address === null) {
-              this.source.guest_shipping_address = res.current.guest_shipping_address;
-              this.source.guest_payment_address = res.current.guest_payment_address;
+              this.source.guest_shipping_address = guestShipping;
+              this.source.guest_payment_address = guestPayment;
             } else {
               if (this.same_as_shipping_address) {
-                this.source.guest_payment_address = res.current.guest_shipping_address;
+                this.source.guest_payment_address = guestShipping;
               }
-              this.source[this.dialogAddress.type] = res.current[this.dialogAddress.type];
+              this.source[this.dialogAddress.type] = this.normalizeAddressData(res.current[this.dialogAddress.type]);
             }
             updateTotal(res.totals)
             updateShippingMethods(res.shipping_methods, res.current.shipping_method_code)
@@ -297,6 +326,8 @@
         $http.put('/checkout', this.form).then((res) => {
           this.form = res.current
           this.source.totals = res.totals
+          this.source.guest_shipping_address = this.normalizeAddressData(res.current.guest_shipping_address);
+          this.source.guest_payment_address  = this.normalizeAddressData(res.current.guest_payment_address);
 
           updateTotal(res.totals)
           updateShippingMethods(res.shipping_methods, res.current.shipping_method_code)
@@ -307,6 +338,10 @@
       },
 
       @hook('checkout._address.vue.methods')
+    },
+
+    mounted() {
+      this.normalizeSourceAddresses();
     },
 
     @hook('admin.brand.index.vue.options')

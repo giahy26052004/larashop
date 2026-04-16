@@ -11,28 +11,15 @@
 
 @section('content')
   <x-shop-breadcrumb type="static" value="checkout.index"/>
+  @php($hideShippingMethodUi = true)
 
   <div class="container">
-    @if (!is_mobile())
-      <div class="row mt-1 justify-content-center">
-        <div class="col-12 col-md-9">@include('shared.steps', ['steps' => 2])</div>
-      </div>
-    @endif
+    <div class="row {{ is_mobile() ? 'mt-2' : 'mt-1' }} justify-content-center">
+      <div class="col-12 col-md-9">@include('shared.steps', ['steps' => 2])</div>
+    </div>
 
-    <div class="row {{ !is_mobile() ? 'mt-5' : ''}}">
+    <div class="row {{ !is_mobile() ? 'mt-5' : 'mt-3' }}">
       <div class="col-12 col-md-8 left-column">
-        @if (!current_customer() && is_mobile())
-          <div class="card total-wrap mb-4 p-lg-4 shadow-sm">
-            <div class="card-header">
-              <h5 class="mb-0">{{ __('shop/login.login_and_sign') }}</h5>
-            </div>
-            <div class="card-body">
-              <button class="btn btn-outline-dark guest-checkout-login"><i
-                  class="bi bi-box-arrow-in-right me-2"></i>{{ __('shop/login.login_and_sign') }}</button>
-            </div>
-          </div>
-        @endif
-
         <div class="card shadow-sm">
           <div class="card-body p-lg-4">
             @hook('checkout.body.header')
@@ -43,6 +30,9 @@
 
             <div class="checkout-black">
               <h5 class="checkout-title">{{ __('shop/checkout.payment_method') }}</h5>
+              @if (count($payment_methods) > 1)
+                <div class="text-muted mb-2">{{ __('shop/checkout.payment_qr_hint') }}</div>
+              @endif
               <div class="radio-line-wrap" id="payment-methods-wrap">
                 @foreach ($payment_methods as $payment)
                   <div class="radio-line-item {{ $payment['code'] == $current['payment_method_code'] ? 'active' : '' }}"
@@ -59,7 +49,7 @@
               </div>
             </div>
 
-            @if ($shipping_require)
+            @if ($shipping_require && !$hideShippingMethodUi)
               @hookwrapper('checkout.shipping_method')
               <div class="checkout-black">
                 <h5 class="checkout-title">{{ __('shop/checkout.delivery_method') }}</h5>
@@ -89,9 +79,28 @@
 
             <div class="checkout-black">
               <h5 class="checkout-title">{{ __('shop/checkout.comment') }}</h5>
+              <div class="mb-3">
+                <label class="form-label">{{ __('shop/checkout.delivery_time') }}</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  name="delivery_time"
+                  value="{{ old('delivery_time') }}"
+                  min="{{ now()->format('Y-m-d\TH:i') }}">
+                <div class="form-text">{{ __('shop/checkout.delivery_time_hint') }}</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">{{ __('shop/checkout.message_card_label') }}</label>
+                <textarea
+                  rows="3"
+                  class="form-control"
+                  name="message_card"
+                  placeholder="{{ __('shop/checkout.message_card_placeholder') }}">{{ old('message_card') }}</textarea>
+              </div>
               <div class="comment-wrap" id="comment-wrap">
+                <label class="form-label">{{ __('shop/checkout.order_comment_label') }}</label>
                 <textarea rows="5" type="text" class="form-control" name="comment"
-                          placeholder="{{ __('shop/checkout.comment') }}">{{ old('comment', $comment ?? '') }}</textarea>
+                          placeholder="{{ __('shop/checkout.order_comment_placeholder') }}">{{ old('comment', $comment ?? '') }}</textarea>
               </div>
             </div>
 
@@ -102,18 +111,6 @@
 
       <div class="col-12 col-md-4 right-column">
         <div class="x-fixed-top">
-          @if (!current_customer() && !is_mobile())
-            <div class="card total-wrap mb-4 p-lg-4 shadow-sm">
-              <div class="card-header">
-                <h5 class="mb-0">{{ __('shop/login.login_and_sign') }}</h5>
-              </div>
-              <div class="card-body">
-                <button class="btn btn-outline-dark guest-checkout-login"><i
-                    class="bi bi-box-arrow-in-right me-2"></i>{{ __('shop/login.login_and_sign') }}</button>
-              </div>
-            </div>
-          @endif
-
           <div class="card total-wrap p-lg-4 shadow-sm">
             <div class="card-header d-flex align-items-center justify-content-between">
               <h5 class="mb-0">{{ __('shop/checkout.cart_totals') }}</h5>
@@ -143,12 +140,38 @@
                 @endforeach
               </div>
               @endhookwrapper
+
+              @if (($mrhoaShipNotice ?? '') !== '' || ($mrhoaShipCheckoutNote ?? '') !== '')
+                <div class="mr-hoa-checkout-shipping-hint small text-muted mb-3 p-2 rounded">
+                  @if (($mrhoaShipNotice ?? '') !== '')
+                    <p class="mb-1 lh-sm">{{ $mrhoaShipNotice }}</p>
+                  @endif
+                  @if (($mrhoaShipCheckoutNote ?? '') !== '')
+                    <p class="mb-0 lh-sm">{{ $mrhoaShipCheckoutNote }}</p>
+                  @endif
+                </div>
+              @endif
+
               <ul class="totals">
                 @foreach ($totals as $total)
                   <li><span>{{ $total['title'] }}</span><span>{{ $total['amount_format'] }}</span></li>
                 @endforeach
               </ul>
+
+              @if (($mrhoaCheckoutTransferText ?? '') !== '')
+                <div class="mr-hoa-checkout-transfer-block mt-3 p-3 rounded small">
+                  <div class="fw-semibold mb-2">{{ __('shop/checkout.transfer_block_title') }}</div>
+                  <p class="mb-0 lh-lg text-body-secondary">{{ $mrhoaCheckoutTransferText }}</p>
+                </div>
+              @endif
+
               <div class="d-grid gap-2 mt-3 submit-checkout-wrap">
+                <div class="form-check text-start">
+                  <input class="form-check-input" type="checkbox" id="confirm-transferred">
+                  <label class="form-check-label" for="confirm-transferred">
+                    {{ __('shop/checkout.confirm_transfer_checkbox') }}
+                  </label>
+                </div>
                 @if (is_mobile())
                   <div class="text-nowrap">
                     <span>{{ __('common.text_total') }}</span>: <span
@@ -176,12 +199,27 @@
 @push('add-scripts')
   <script>
     $(document).ready(function () {
+      try {
+        var gn = sessionStorage.getItem('mrhoa_gift_note');
+        var $c = $('textarea[name=comment]');
+        if (gn && $c.length && (!$c.val() || !$c.val().trim())) {
+          $c.val(gn);
+        }
+      } catch (e) {
+      }
+
       $(document).on('click', '.radio-line-item', function (event) {
         if ($(this).hasClass('active')) return;
         updateCheckout($(this).data('key'), $(this).data('value'))
       });
 
       $('#submit-checkout').click(function (event) {
+        if (!$('#confirm-transferred').is(':checked')) {
+          layer.msg(@json(__('shop/checkout.confirm_transfer_required')), () => {
+          })
+          return;
+        }
+
         const address = config.isLogin ? checkoutAddressApp.form.shipping_address_id : checkoutAddressApp.source.guest_shipping_address;
         const payment = config.isLogin ? checkoutAddressApp.form.payment_address_id : checkoutAddressApp.source.guest_payment_address;
 
@@ -198,7 +236,9 @@
         }
 
         let data = {
-          comment: $('textarea[name=comment]').val()
+          message_card: $('textarea[name=message_card]').val(),
+          comment: $('textarea[name=comment]').val(),
+          delivery_time: $('input[name=delivery_time]').val()
         }
 
         $http.post('/checkout/confirm', data).then((res) => {

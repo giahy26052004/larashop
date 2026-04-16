@@ -46,7 +46,7 @@ class SettingsSeeder extends Seeder
             ["type" => "system", "space" => "base", "name" => "admin_name", "value" => "admin", "json" => 0],
             ["type" => "system", "space" => "base", "name" => "tax", "value" => "1", "json" => 0],
             ["type" => "system", "space" => "base", "name" => "tax_address", "value" => "payment", "json" => 0],
-            ["type" => "system", "space" => "base", "name" => "currency", "value" => "USD", "json" => 0],
+            ["type" => "system", "space" => "base", "name" => "currency", "value" => "VND", "json" => 0],
             ["type" => "system", "space" => "base", "name" => "zone_id", "value" => "710", "json" => 0],
             ["type" => "plugin", "space" => "header_menu", "name" => "status", "value" => "1", "json" => 0],
             ["type" => "plugin", "space" => "stripe", "name" => "publishable_key", "value" => "", "json" => 0],
@@ -65,14 +65,15 @@ class SettingsSeeder extends Seeder
             ["type" => "system", "space" => "base", "name" => "meta_keywords", "value" => "开源电商,开源代码,开源电商项目,b2b独立站,dtc独立站,跨境电商网", "json" => 0],
             ["type" => "system", "space" => "base", "name" => "telephone", "value" => "028-xxxxxxxx", "json" => 0],
             ["type" => "system", "space" => "base", "name" => "email", "value" => "support@example.com", "json" => 0],
-            ["type" => "plugin", "space" => "flat_shipping", "name" => "type", "value" => "percent", "json" => 0],
-            ["type" => "plugin", "space" => "flat_shipping", "name" => "value", "value" => "10", "json" => 0],
+            ["type" => "plugin", "space" => "flat_shipping", "name" => "type", "value" => "fixed", "json" => 0],
+            ["type" => "plugin", "space" => "flat_shipping", "name" => "value", "value" => "30000", "json" => 0],
             ["type" => "system", "space" => "base", "name" => "default_customer_group_id", "value" => "1", "json" => 0],
             ["type" => "plugin", "space" => "stripe", "name" => "status", "value" => "1", "json" => 0],
             ["type" => "plugin", "space" => "latest_products", "name" => "status", "value" => "1", "json" => 0],
             ["type" => "plugin", "space" => "flat_shipping", "name" => "status", "value" => "1", "json" => 0],
             ["type" => "plugin", "space" => "paypal", "name" => "status", "value" => "1", "json" => 0],
             ["type" => "system", "space" => "base", "name" => "rate_api_key", "value" => "", "json" => 0],
+            ["type" => "system", "space" => "base", "name" => "cart_shipping_estimate", "value" => "30000", "json" => 0],
         ];
     }
 }

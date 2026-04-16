@@ -231,12 +231,26 @@ class CartService
         $quantityAll = collect($carts)->sum('quantity');
         $amount      = $cartList->sum('subtotal');
 
+        $configuredShip = system_setting('base.cart_shipping_estimate', null);
+        if ($configuredShip === null || trim((string) $configuredShip) === '') {
+            $configuredShip = '30000';
+        }
+
+        $shippingEst = $quantity < 1
+            ? 0.0
+            : max(0.0, (float) $configuredShip);
+        $grandEst = round($amount + $shippingEst, 4);
+
         $data = [
-            'carts'         => $carts,
-            'quantity'      => $quantity,
-            'quantity_all'  => $quantityAll,
-            'amount'        => $amount,
-            'amount_format' => currency_format($amount),
+            'carts'                           => $carts,
+            'quantity'                        => $quantity,
+            'quantity_all'                    => $quantityAll,
+            'amount'                          => $amount,
+            'amount_format'                   => currency_format($amount),
+            'cart_shipping_estimate'          => $shippingEst,
+            'cart_shipping_estimate_format'    => currency_format($shippingEst),
+            'cart_grand_total_estimated'      => $grandEst,
+            'cart_grand_total_estimated_format' => currency_format($grandEst),
         ];
 
         return hook_filter('service.cart.data', $data);

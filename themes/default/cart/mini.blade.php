@@ -1,6 +1,6 @@
 <div class="offcanvas-header">
   <h5 id="offcanvasRightLabel" class="mx-auto mb-0">{{ __('shop/carts.mini') }}</h5>
-  <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="{{ __('common.close') }}"></button>
 </div>
 <div class="offcanvas-body pt-0">
   @php $check = 0 @endphp

@@ -35,7 +35,7 @@
                   <img class="rounded-3" id="avatar" alt="{{ $customer->name }}" src="{{ image_resize($customer->avatar, 200, 200) }}"
                     width="90">
                   <div class="ps-3">
-                    <label class="btn btn-light shadow-sm bg-body mb-2" data-toggle="tooltip" title="Change your avatar">
+                    <label class="btn btn-light shadow-sm bg-body mb-2" data-toggle="tooltip" title="{{ __('shop/account/edit.change_avatar_tooltip') }}">
                       <i class="bi bi-arrow-repeat"></i> {{ __('shop/account/edit.modify_avatar') }}
                       <input type="file" class="d-none" id="update-btn" name="" accept="image/*">
                       <input type="hidden" id="avatar-input" name="avatar" value="{{ $customer->avatar }}">
@@ -90,7 +90,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">{{ __('shop/account/edit.crop') }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('common.close') }}"></button>
         </div>
         <div class="modal-body">
           <div class="img-container">

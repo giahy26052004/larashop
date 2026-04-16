@@ -13,7 +13,6 @@ namespace Beike\Shop\Services;
 
 use Beike\Models\Order;
 use Beike\Repositories\OrderRepo;
-use Illuminate\Support\Str;
 
 class PaymentService
 {
@@ -46,23 +45,9 @@ class PaymentService
      */
     public function pay()
     {
-        $orderPaymentCode = $this->paymentMethodCode;
-        $paymentCode      = Str::studly($orderPaymentCode);
-        $viewPath         = "$paymentCode::checkout.payment";
-
-        $viewPath = hook_filter('service.payment.pay.view_path', $viewPath);
-
-        if (! view()->exists($viewPath)) {
-            throw new \Exception("找不到支付方式 {$orderPaymentCode} 模板 {$viewPath}");
-        }
-        $paymentData = [
-            'order'           => $this->order,
-            'payment_setting' => plugin_setting($orderPaymentCode),
-        ];
-
-        $paymentData = hook_filter('service.payment.pay.data', $paymentData);
-
-        $paymentView = view($viewPath, $paymentData)->render();
+        $paymentView = view('checkout.manual_transfer', [
+            'order' => $this->order,
+        ])->render();
 
         return view('checkout.payment', ['order' => $this->order, 'payment' => $paymentView]);
     }

@@ -3,55 +3,38 @@
   <div class="address-dialog">
     <el-dialog custom-class="mobileWidth" title="{{ __('address.index') }}" :visible.sync="editShow" @close="closeAddressDialog('addressForm')" :close-on-click-modal="false">
       <el-form ref="addressForm" :rules="rules" label-position="top" :model="form" label-width="100px">
-        <div class="d-flex">
-          <el-form-item label="{{ __('address.name') }}" class="w-50" prop="name">
+        <div class="d-flex flex-column flex-sm-row flex-wrap mr-hoa-name-email-row">
+          <el-form-item label="{{ __('address.name') }}" class="flex-grow-1 mr-hoa-form-item-name" prop="name">
             <el-input v-model="form.name" placeholder="{{ __('address.name') }}"></el-input>
           </el-form-item>
           @if (!current_customer())
-          <el-form-item label="{{ __('common.email') }}" prop="email" v-if="type == 'guest_shipping_address' || !shippingRequired" class="w-50 ms-3">
+          <el-form-item label="{{ __('common.email') }}" prop="email" v-if="type == 'guest_shipping_address' || !shippingRequired" class="flex-grow-1 mr-hoa-form-item-email">
             <el-input v-model="form.email" placeholder="{{ __('common.email') }}"></el-input>
-          </el-form-item>
-          @else
-          <el-form-item label="{{ __('address.address_1') }}"  class="w-50 ms-3" prop="address_1">
-            <el-input v-model="form.address_1" placeholder="{{ __('address.address_1') }}"></el-input>
           </el-form-item>
           @endif
         </div>
-        @if (!current_customer())
-        <el-form-item label="{{ __('address.address_1') }}" prop="address_1">
-          <el-input v-model="form.address_1" placeholder="{{ __('address.address_1') }}"></el-input>
+        <el-form-item label="{{ __('address.address_2') }}">
+          <el-input v-model="form.address_2" placeholder="{{ __('address.address_2') }}"></el-input>
         </el-form-item>
-        @endif
-        <div class="d-flex">
-          <el-form-item label="{{ __('address.address_2') }}" class="w-50">
-            <el-input v-model="form.address_2" placeholder="{{ __('address.address_2') }}"></el-input>
-          </el-form-item>
-          <el-form-item label="{{ __('address.post_code') }}" class="w-50 ms-3">
-            <el-input v-model="form.zipcode" placeholder="{{ __('address.post_code') }}"></el-input>
-          </el-form-item>
-        </div>
         <div class="d-flex dialog-address">
-          <el-form-item label="{{ __('address.phone') }}" class="w-50">
+          <el-form-item label="{{ __('address.phone') }}" class="w-100">
             <el-input maxlength="11" v-model="form.phone" type="number" placeholder="{{ __('address.phone') }}"></el-input>
           </el-form-item>
-          <el-form-item prop="city" label="{{ __('shop/account/addresses.enter_city') }}" required class="w-50 ms-3">
-            <el-input v-model="form.city" placeholder="{{ __('shop/account/addresses.enter_city') }}"></el-input>
-          </el-form-item>
         </div>
-        <div class="d-flex">
-          <el-form-item label="{{ __('address.country') }}" required class="w-50">
-            <el-select v-model="form.country_id" class="w-100" filterable placeholder="{{ __('address.country_id') }}" @change="countryChange">
-              <el-option v-for="item in source.countries" :key="item.id" :label="item.name"
-              :value="item.id">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item prop="zone_id" label="{{ __('address.zone') }}" class="w-50 ms-3">
-            <el-select v-model="form.zone_id" class="w-100" filterable placeholder="{{ __('address.zone') }}">
+        <input type="hidden" v-model="form.country_id">
+        <div class="d-flex flex-column flex-lg-row mr-hoa-address-fields-row">
+          <el-form-item prop="zone_id" label="Tỉnh/Thành phố *" class="mr-hoa-address-field">
+            <el-select v-model="form.zone_id" class="w-100" filterable placeholder="Chọn một tùy chọn…">
               <el-option v-for="item in source.zones" :key="item.id" :label="item.name"
                 :value="item.id">
               </el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item prop="city" label="Quận huyện *" required class="mr-hoa-address-field">
+            <el-input v-model="form.city" placeholder="Chọn quận/huyện"></el-input>
+          </el-form-item>
+          <el-form-item prop="address_1" label="Địa chỉ *" class="mr-hoa-address-field">
+            <el-input v-model="form.address_1" placeholder="{{ __('address.address_1') }}"></el-input>
           </el-form-item>
         </div>
         <el-form-item label="" v-if="source.isLogin">
@@ -101,9 +84,9 @@
           trigger: 'blur'
         }, ],
         email: [{
-          required: true,
+          required: false,
           type: 'email',
-          message: '{{ __('shop/login.enter_email') }}',
+          message: '{{ __('shop/login.email_err') }}',
           trigger: 'blur'
         }, ],
         address_1: [{
@@ -112,13 +95,13 @@
           trigger: 'blur'
         }, ],
         zone_id: [{
-          required: true,
+          required: false,
           message: '{{ __('shop/account/addresses.select_province') }}',
           trigger: 'blur'
         }, ],
         city: [{
           required: true,
-          message: '{{ __('shop/account/addresses.enter_city') }}',
+          message: 'Vui lòng nhập quận/huyện',
           trigger: 'blur'
         }, ],
       },
@@ -139,11 +122,42 @@
   },
 
   methods: {
+    buildDefaultForm() {
+      return {
+        name: '',
+        email: '',
+        phone: '',
+        country_id: @json((int) system_setting('base.country_id')),
+        zipcode: '',
+        zone_id: @json((int) system_setting('base.zone_id')),
+        city: '',
+        address_1: '',
+        address_2: '',
+        default: false,
+      };
+    },
+
+    normalizeAddressInput(addresses) {
+      if (!addresses) return this.buildDefaultForm();
+
+      let parsed = addresses;
+      if (typeof parsed === 'string') {
+        try {
+          parsed = JSON.parse(parsed);
+        } catch (e) {
+          parsed = {};
+        }
+      }
+      if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+        parsed = {};
+      }
+
+      return Object.assign(this.buildDefaultForm(), parsed);
+    },
+
     editAddress(addresses, type, shippingRequired = true) {
       this.type = type
-      if (addresses) {
-        this.form = addresses
-      }
+      this.form = this.normalizeAddressInput(addresses)
 
       this.countryChange(this.form.country_id);
       this.shippingRequired = shippingRequired;
@@ -162,24 +176,32 @@
     },
 
     closeAddressDialog() {
-      this.$refs['addressForm'].resetFields();
+      if (this.$refs['addressForm']) {
+        this.$refs['addressForm'].resetFields();
+      }
       this.editShow = false
-
-      Object.keys(this.form).forEach(key => this.form[key] = '')
-      this.form.country_id = @json((int) system_setting('base.country_id'));
-      this.form.default = false;
+      this.form = this.buildDefaultForm();
+      this.source.zones = [];
     },
 
     countryChange(e) {
-      const self = this;
+      const countryId = parseInt(e, 10);
+      if (!Number.isFinite(countryId) || countryId <= 0) {
+        this.source.zones = [];
+        this.form.zone_id = '';
+        return;
+      }
 
-      $http.get(`/countries/${e}/zones`, null, {
+      $http.get(`/countries/${countryId}/zones`, null, {
         hload: true
       }).then((res) => {
         this.source.zones = res.data.zones;
 
         if (!res.data.zones.some(e => e.id == this.form.zone_id)) {
           this.form.zone_id = '';
+        }
+        if (!this.form.zone_id && res.data.zones.length) {
+          this.form.zone_id = res.data.zones[0].id;
         }
       })
     },

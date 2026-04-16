@@ -80,7 +80,11 @@ class Url
         } elseif ($type == 'rma') {
             return shop_route('account.rma.show', ['id' => $value]);
         } elseif ($type == 'static') {
-            return shop_route($value);
+            try {
+                return shop_route($value);
+            } catch (\Throwable $e) {
+                return '';
+            }
         } elseif ($type == 'custom') {
             if (Str::startsWith($value, ['http://', 'https://'])) {
                 return $value;

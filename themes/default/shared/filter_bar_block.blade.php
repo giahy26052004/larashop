@@ -21,7 +21,11 @@
   @endif
   <div class="d-flex align-items-center right-per-page">
     <div class="text-nowrap text-secondary">
-      {{ __('common.showing_page', ['per_page' => request('per_page'), 'total' => $products->total()]) }}
+      @if ((int) $products->total() === 0)
+        {{ __('common.showing_page_none') }}
+      @else
+        {{ __('common.showing_page', ['first' => $products->firstItem(), 'last' => $products->lastItem(), 'total' => $products->total()]) }}
+      @endif
     </div>
 
     <div class="d-flex align-items-center">

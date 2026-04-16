@@ -88,16 +88,32 @@
       <div class="col-12 col-md-3 right-column">
         <div class="card shadow-sm x-fixed-top">
           <div class="card-body p-lg-4">
-            <div class="card total-wrap">
-              <div class="p-lg-0"><h4 class="mb-3">{{ __('shop/carts.product_total') }}</h4></div>
+            <div class="card total-wrap mr-hoa-cart-totals">
+              <div class="p-lg-0"><h4 class="mb-3">{{ __('shop/carts.cart_summary_title') }}</h4></div>
               <div class="card-body p-lg-0">
                 <ul class="list-group list-group-flush">
                   @hook('shop.cart.index.total.before')
                   <li class="list-group-item"><span>{{ __('shop/carts.all') }}</span><span>@{{ allProduct }}</span></li>
                   <li class="list-group-item"><span>{{ __('shop/carts.selected') }}</span><span>@{{ total_quantity }}</span></li>
-                  <li class="list-group-item border-bottom-0"><span>{{ __('shop/carts.product_total') }}</span><span class="total-price">@{{ amount_format }}</span></li>
+                  <li class="list-group-item d-flex justify-content-between align-items-baseline">
+                    <span>{{ __('shop/carts.subtotal') }}</span>
+                    <span class="total-price">@{{ amount_format }}</span>
+                  </li>
+                  <li class="list-group-item mr-hoa-cart-shipping-block">
+                    <div class="fw-semibold mb-1">@{{ shipping_line_title }}</div>
+                    <p class="small text-muted mb-2 lh-sm" v-if="shipping_notice">@{{ shipping_notice }}</p>
+                    <div class="d-flex justify-content-between align-items-center small">
+                      <span>{{ __('shop/carts.shipping_estimate_label') }}</span>
+                      <span class="fw-medium">@{{ cart_shipping_estimate_format }}</span>
+                    </div>
+                    <p class="small text-muted mt-2 mb-0 lh-sm" v-if="shipping_checkout_note">@{{ shipping_checkout_note }}</p>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-baseline border-bottom-0 pt-2">
+                    <span class="fw-bold">{{ __('shop/carts.order_total_estimated') }}</span>
+                    <span class="total-price fw-bold fs-5">@{{ cart_grand_total_estimated_format }}</span>
+                  </li>
                   @hook('shop.cart.index.total.after')
-                  <li class="list-group-item d-grid gap-2 mt-3 border-bottom-0">
+                  <li class="list-group-item d-grid gap-2 mt-1 border-bottom-0 pt-0">
                     @hookwrapper('cart.confirm')
                     <button type="button" class="btn btn-primary fs-5 fw-bold" @click="checkedBtnToCheckout">{{ __('shop/carts.to_checkout') }}</button>
                     @endhookwrapper
@@ -140,6 +156,11 @@
         total_quantity: @json($quantity),
         amount: @json($amount),
         amount_format: @json($amount_format),
+        cart_shipping_estimate_format: @json($cart_shipping_estimate_format ?? ''),
+        cart_grand_total_estimated_format: @json($cart_grand_total_estimated_format ?? ''),
+        shipping_line_title: @json(system_setting('base.cart_shipping_line_title', __('shop/carts.estimated_shipping_default_title'))),
+        shipping_notice: @json(system_setting('base.cart_shipping_notice', '')),
+        shipping_checkout_note: @json(system_setting('base.cart_shipping_checkout_note', '')),
 
         @hook('shop.cart.index.vue.data')
       },
@@ -214,6 +235,12 @@
           this.products = res.data.carts
           this.amount_format = res.data.amount_format
           this.total_quantity = res.data.quantity
+          if (res.data.cart_shipping_estimate_format !== undefined) {
+            this.cart_shipping_estimate_format = res.data.cart_shipping_estimate_format
+          }
+          if (res.data.cart_grand_total_estimated_format !== undefined) {
+            this.cart_grand_total_estimated_format = res.data.cart_grand_total_estimated_format
+          }
           bk.getCarts()
         },
 

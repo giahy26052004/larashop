@@ -1,6 +1,6 @@
 @extends('admin::layouts.master')
 
-@section('title', __('admin/common.category'))
+@section('title', 'Danh mục')
 
 @section('body-class', 'page-categories')
 
@@ -19,7 +19,7 @@
 
       <div class="d-flex">
         @hook('admin.categories.index.top_buttons.before')
-        <a href="{{ admin_route('categories.create') }}" class="btn btn-primary">{{ __('admin/category.categories_create') }}</a>
+        <a href="{{ admin_route('categories.create') }}" class="btn btn-primary">Thêm danh mục</a>
         @hook('admin.categories.create.after')
       </div>
 
@@ -29,11 +29,11 @@
           <div class="custom-tree-node d-flex align-items-center justify-content-between w-100" slot-scope="{ node, data }">
             <div><span>@{{ data.id }} - @{{ data.name }}</span></div>
             <div class="d-flex align-items-center">
-              <span class="me-4 badge bg-success" v-if="data.active">{{ __('common.enabled') }}</span>
-              <span class="me-4 badge bg-secondary" v-else>{{ __('common.disabled') }}</span>
+              <span class="me-4 badge bg-success" v-if="data.active">Đang bật</span>
+              <span class="me-4 badge bg-secondary" v-else>Đang tắt</span>
               <div>
-                <button class="btn btn-outline-secondary btn-sm" @click.stop="toEdit(data.url_edit)">{{ __('common.edit') }}</button>
-                <button class="btn btn-outline-danger btn-sm" @click.stop="removeCategory(node, data)">{{ __('common.delete') }}</button>
+                <button class="btn btn-outline-secondary btn-sm" @click.stop="toEdit(data.url_edit)">Sửa</button>
+                <button class="btn btn-outline-danger btn-sm" @click.stop="removeCategory(node, data)">Xóa</button>
                 @hook('admin.categories.delete.after')
               </div>
             </div>
@@ -54,7 +54,8 @@
     let category_app = new Vue({
       el: '#category-app',
       data: {
-        categories: @json($categories),
+        categories: [],
+        rawCategories: @json($categories),
         defaultProps: {
           children: 'children',
           label: 'name'
@@ -62,11 +63,17 @@
         @hook('admin.categories.index.vue.data')
       },
 
+      created() {
+        this.categories = (this.rawCategories || [])
+          .filter(item => !item.parent_id)
+          .map(item => ({...item, children: []}));
+      },
+
       methods: {
         removeCategory(node, data) {
-          this.$confirm('{{ __('common.confirm_delete') }}', '{{ __('common.text_hint') }}', {
-            confirmButtonText: '{{ __('common.confirm') }}',
-            cancelButtonText: '{{ __('common.cancel') }}',
+          this.$confirm('Bạn có chắc chắn muốn xóa danh mục này?', 'Xác nhận xóa', {
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
             type: 'warning'
           }).then(() => {
             $http.delete(`/categories/${data.id}`).then((res) => {

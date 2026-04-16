@@ -10,7 +10,7 @@
  */
 
 return [
-    'uploaded_success' => 'Uploaded Success',
-    'invalid_filename' => 'Invalid filename',
-    'invalid_type'     => 'Invalid type parameter',
+    'uploaded_success' => 'Tải lên thành công',
+    'invalid_filename' => 'Tên tệp không hợp lệ',
+    'invalid_type'     => 'Tham số loại tệp không hợp lệ',
 ];

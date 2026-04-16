@@ -12,6 +12,7 @@
 namespace Beike\Services;
 
 use Beike\Admin\Repositories\PageRepo;
+use Beike\Models\ProductSku;
 use Beike\Repositories\BrandRepo;
 use Beike\Repositories\ProductRepo;
 use Beike\Shop\Http\Resources\BrandDetail;
@@ -237,16 +238,86 @@ class DesignService
         }
 
         foreach ($tabs as $index => $tab) {
-            $tabs[$index]['title'] = $tab['title'][locale()] ?? '';
-            $productsIds           = $tab['products'];
+            $tabTitle = $tab['title'] ?? '';
+            if (is_array($tabTitle)) {
+                $tabTitle = $tabTitle[locale()] ?? '';
+            }
+            $normalizedTitle       = shop_ui_vietnamese((string) $tabTitle);
+            $tabs[$index]['title'] = $normalizedTitle;
+            $productsIds           = $tab['products'] ?? [];
+
+            // Tab "Hoa mới về" / "Ưu đãi" lấy dữ liệu động, không cần chọn tay từng sản phẩm.
+            $dynamicIds = self::resolveDynamicTabProductIds($normalizedTitle, $productsIds);
+            if ($dynamicIds !== null) {
+                $productsIds = $dynamicIds;
+            }
+
             if ($productsIds) {
                 $tabs[$index]['products'] = ProductRepo::getProductsByIds($productsIds)->jsonSerialize();
+            } else {
+                $tabs[$index]['products'] = [];
             }
         }
-        $content['tabs']  = $tabs;
-        $content['title'] = $content['title'][locale()] ?? '';
+        $content['tabs'] = $tabs;
+        $rawTitle        = $content['title'] ?? '';
+        if (is_array($rawTitle)) {
+            $mainTitle = (string) ($rawTitle[locale()] ?? '');
+        } else {
+            $mainTitle = (string) $rawTitle;
+        }
+        $content['title'] = shop_ui_vietnamese($mainTitle);
 
         return $content;
+    }
+
+    /**
+     * Với tab đặc biệt, trả về danh sách sản phẩm động.
+     * - "Hoa mới về": mới nhất theo created_at
+     * - "Ưu đãi": có giá gốc > giá bán
+     * Return null nếu không phải tab đặc biệt.
+     */
+    private static function resolveDynamicTabProductIds(string $tabTitle, array $fallbackIds): ?array
+    {
+        $key   = mb_strtolower(trim($tabTitle), 'UTF-8');
+        $limit = count($fallbackIds) > 0 ? count($fallbackIds) : 8;
+
+        if (in_array($key, ['hoa mới về', 'hoa moi ve'], true)) {
+            return ProductRepo::getBuilder([
+                'active' => 1,
+                'sort'   => 'created_at',
+                'order'  => 'desc',
+            ])->whereHas('masterSku')
+                ->limit($limit)
+                ->pluck('products.id')
+                ->toArray();
+        }
+
+        if (in_array($key, ['ưu đãi', 'uu dai'], true)) {
+            $discountProductIds = ProductSku::query()
+                ->where('is_default', 1)
+                ->where('origin_price', '>', 0)
+                ->whereColumn('origin_price', '>', 'price')
+                ->orderByDesc('updated_at')
+                ->limit($limit * 4)
+                ->pluck('product_id')
+                ->unique()
+                ->values()
+                ->toArray();
+
+            if ($discountProductIds === []) {
+                return [];
+            }
+
+            return ProductRepo::getBuilder([
+                'active'      => 1,
+                'product_ids' => $discountProductIds,
+            ])->whereHas('masterSku')
+                ->limit($limit)
+                ->pluck('products.id')
+                ->toArray();
+        }
+
+        return null;
     }
 
     /**
@@ -275,7 +346,13 @@ class DesignService
     private static function handleProducts($content): array
     {
         $content['products'] = ProductRepo::getProductsByIds($content['products'])->jsonSerialize();
-        $content['title']    = $content['title'][locale()] ?? '';
+        $rawTitle              = $content['title'] ?? '';
+        if (is_array($rawTitle)) {
+            $title = (string) ($rawTitle[locale()] ?? '');
+        } else {
+            $title = (string) $rawTitle;
+        }
+        $content['title'] = shop_ui_vietnamese($title);
 
         return $content;
     }

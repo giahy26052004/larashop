@@ -187,7 +187,9 @@ function type_route($type, $value): string
  */
 function type_label($type, $value, array $texts = []): string
 {
-    return \Beike\Libraries\Url::getInstance()->label($type, $value, $texts);
+    $label = \Beike\Libraries\Url::getInstance()->label($type, $value, $texts);
+
+    return shop_ui_vietnamese($label);
 }
 
 /**
@@ -563,12 +565,20 @@ function currencies()
  */
 function current_currency_code(): string
 {
+    $default = system_setting('base.currency');
+    $enabled = currencies()->pluck('code')->toArray();
+
     $registerLocale = registry('currency');
-    if ($registerLocale) {
+    if ($registerLocale && in_array($registerLocale, $enabled, true)) {
         return $registerLocale;
     }
 
-    return Session::get('currency') ?? system_setting('base.currency');
+    $session = Session::get('currency');
+    if ($session && in_array($session, $enabled, true)) {
+        return $session;
+    }
+
+    return $default && in_array($default, $enabled, true) ? $default : ($enabled[0] ?? 'VND');
 }
 
 /**
@@ -1160,4 +1170,119 @@ function get_safe_host(): string
 
     // 再不行就返回空字符串
     return '';
+}
+
+/**
+ * Chuẩn hóa một số nhãn tiếng Việt không dấu / tiếng Anh giao diện shop sang bản có dấu.
+ */
+function shop_ui_vietnamese(string $text): string
+{
+    $trimmed = trim(preg_replace('/\s+/u', ' ', $text));
+    if ($trimmed === '') {
+        return $text;
+    }
+
+    static $map = null;
+    if ($map === null) {
+        $map = [
+            'trang chu'               => 'Trang chủ',
+            'hoa sinh nhat'           => 'Hoa Sinh Nhật',
+            'hoa khai truong'         => 'Hoa Khai Trương',
+            'hoa chia buon'           => 'Hoa Chia Buồn',
+            'hoa theo dip'            => 'Hoa theo dịp',
+            'hoa tang'                => 'Hoa tặng',
+            'hoa tinh yeu'            => 'Hoa tình yêu',
+            'hoa valentine'           => 'Hoa Valentine',
+            'hoa chuc mung'           => 'Hoa chúc mừng',
+            'hoa me be'               => 'Hoa mẹ & bé',
+            'hoa tan gia'             => 'Hoa tân gia',
+            'lien he'                 => 'Liên hệ',
+            'latest products'         => 'Hoa mới',
+            'san pham moi nhat'       => 'Hoa mới',
+            'hoa moi'                 => 'Hoa mới',
+            'san pham noi bat'        => 'Sản phẩm nổi bật',
+            'tat ca san pham'         => 'Tất cả sản phẩm',
+            'cua hang'                => 'Cửa hàng',
+            'gio hang'                => 'Giỏ hàng',
+            'thanh toan'              => 'Thanh toán',
+            'danh muc'                => 'Danh mục',
+            'tat ca'                  => 'Tất cả',
+            've chung toi'            => 'Về chúng tôi',
+            'cua hang hoa cua ban'    => 'Cửa hàng hoa của bạn',
+            'tin tuc'                 => 'Tin tức',
+            'khuyen mai'              => 'Khuyến mãi',
+            'lien he voi chung toi'   => 'Liên hệ với chúng tôi',
+            'fashion sheet'           => 'Kiểu bó nổi bật',
+            'trendy outfits'          => 'Hoa mới về',
+            'promotions'              => 'Ưu đãi',
+            'fashion items'           => 'Gợi ý cho bạn',
+        ];
+    }
+
+    $key = mb_strtolower($trimmed, 'UTF-8');
+    if (isset($map[$key])) {
+        return $map[$key];
+    }
+
+    return $text;
+}
+
+/**
+ * Sửa nhanh các cụm không dấu / sai dấu thường gặp trong HTML giới thiệu chân trang (TinyMCE).
+ */
+function mrhoa_footer_intro_html(string $html): string
+{
+    if ($html === '') {
+        return $html;
+    }
+
+    $pairs = [
+        'chuyen hoa tuoi'      => 'chuyển hoa tươi',
+        'sinh nhat,'           => 'sinh nhật,',
+        'sinh nhat'            => 'sinh nhật',
+        'khai truong'          => 'khai trương',
+        'chia buon'            => 'chia buồn',
+        'va su kien'           => 'và sự kiện',
+        'Nhan giao nhanh'      => 'Nhận giao nhanh',
+        'nhan giao nhanh'      => 'nhận giao nhanh',
+        'Ve chung toi'         => 'Về chúng tôi',
+        've chung toi'         => 'về chúng tôi',
+        'Cua hang hoa cua ban' => 'Cửa hàng hoa của bạn',
+        'cua hang hoa cua ban' => 'cửa hàng hoa của bạn',
+    ];
+
+    foreach ($pairs as $from => $to) {
+        $html = str_ireplace($from, $to, $html);
+    }
+
+    return $html;
+}
+
+/**
+ * Chuỗi giờ giao mong muốn (datetime-local / ISO) → đọc dễ + gợi ý khung giờ (02:xx = rạng sáng, không phải chiều).
+ */
+function mrhoa_format_delivery_wish(?string $raw): string
+{
+    $raw = trim((string) $raw);
+    if ($raw === '' || $raw === '-') {
+        return '-';
+    }
+
+    try {
+        $normalized = preg_replace('/\s*T\s*/u', ' ', $raw, 1);
+        $dt = \Carbon\Carbon::parse($normalized);
+    } catch (\Throwable $e) {
+        return $raw;
+    }
+
+    $hour = (int) $dt->format('G');
+    $part = match (true) {
+        $hour >= 5 && $hour < 12  => 'buổi sáng',
+        $hour >= 12 && $hour < 18 => 'buổi chiều',
+        $hour >= 18 && $hour < 22 => 'buổi tối',
+        $hour >= 22               => 'đêm',
+        default                   => 'rạng sáng',
+    };
+
+    return $dt->format('d/m/Y') . ' lúc ' . $dt->format('H:i') . ' · ' . $part;
 }

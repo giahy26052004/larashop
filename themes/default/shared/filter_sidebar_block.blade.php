@@ -3,35 +3,15 @@
   <ul class="sidebar-widget mb-0" id="category-one">
     @foreach ($all_categories as $key_a => $category_all)
     @if (!$category_all['active']) @continue @endif
+    @if ($category_all['parent_id'] ?? 0) @continue @endif
     <li class="{{ $category_all['id'] == $category->id ? 'active' : ''}}">
       <a href="{{ $category_all['url'] }}" title="{{ $category_all['name'] }}" class="category-href">{{ $category_all['name'] }}</a>
-      @if ($category_all['children'] ?? false)
-        <button class="toggle-icon btn {{ $category_all['id'] == $category->id ? '' : 'collapsed'}}" data-bs-toggle="collapse" href="#category-{{ $key_a }}"><i class="bi bi-chevron-up"></i></button>
-        <ul id="category-{{ $key_a }}" class="accordion-collapse collapse {{ $category_all['id'] == $category->id ? 'show' : ''}}" data-bs-parent="#category-one">
-          @foreach ($category_all['children'] as $key_b => $child)
-          @if (!$child['active']) @continue @endif
-          <li class="{{ $child['id'] == $category->id ? 'active' : ''}} child-category">
-            <a href="{{ $child['url'] }}" title="{{ $child['name'] }}" class="category-href">{{ $child['name'] }}</a>
-            @if ($child['children'] ?? false)
-              <button class="toggle-icon btn {{ $child['id'] == $category->id ? '' : 'collapsed'}}" data-bs-toggle="collapse" href="#category-{{ $key_a }}-{{ $key_b }}"><i class="bi bi-chevron-up"></i></button>
-              <ul id="category-{{ $key_a }}-{{ $key_b }}" class="accordion-collapse collapse {{ $child['id'] == $category->id ? 'show' : ''}}" data-bs-parent="#category-{{ $key_a }}">
-                @foreach ($child['children'] as $key_c => $sub_child)
-                <li class="{{ $sub_child['id'] == $category->id ? 'active' : ''}} child-category">
-                  <a href="{{ $sub_child['url'] }}" title="{{ $sub_child['name'] }}" class="category-href">{{ $sub_child['name'] }}</a>
-                </li>
-                @endforeach
-              </ul>
-            @endif
-          </li>
-          @endforeach
-        </ul>
-      @endif
     </li>
     @endforeach
   </ul>
 </div>
 
-<div class="filter-box">
+<div class="filter-box mr-hoa-filter-box">
   @if ($filter_data['price']['min'] != $filter_data['price']['max'])
     @hookwrapper('category.filter.sidebar.price')
     @push('header')
@@ -40,11 +20,11 @@
     @endpush
 
     @if (system_setting('base.multi_filter.price_filter', 1))
-      <div class="card">
-        <div class="card-header p-0">
-          <h4 class="mb-3">{{ __('product.price') }}</h4>
+      <div class="card mr-hoa-filter-card">
+        <div class="card-header border-0 p-0">
+          <h4 class="mr-hoa-filter-title mb-2">{{ __('product.price') }}</h4>
         </div>
-        <div class="card-body p-0">
+        <div class="card-body p-0 pt-1">
           <div id="price-slider" class="mb-2"><div class="slider-bg"></div></div>
           <div class="text-secondary price-range d-flex justify-content-between">
             <div class="d-flex align-items-center wp-100">
@@ -66,15 +46,16 @@
 
   @hookwrapper('category.filter.sidebar.attr')
   @foreach ($filter_data['attr'] as $index => $attr)
-  <div class="card">
-    <div class="card-header fw-bold p-0">
-      <h4 class="mb-3">{{ $attr['name'] }}</h4>
+  <div class="card mr-hoa-filter-card">
+    <div class="card-header border-0 p-0 fw-normal">
+      <h4 class="mr-hoa-filter-title mb-2">{{ $attr['name'] }}</h4>
     </div>
-    <ul class="list-group list-group-flush attribute-item" data-attribute-id="{{ $attr['id'] }}">
+    <ul class="list-group list-group-flush attribute-item mr-hoa-filter-attr-list" data-attribute-id="{{ $attr['id'] }}">
       @foreach ($attr['values'] as $value_index => $value)
-      <li class="list-group-item border-0 px-0">
-        <label class="form-check-label d-block">
-          <input class="form-check-input attr-value-check me-2" data-attr="{{ $index }}" data-attrval="{{ $value_index }}" {{ $value['selected'] ? 'checked' : '' }} name="6" type="checkbox" value="{{ $value['id'] }}">{{ $value['name'] }}
+      <li class="list-group-item border-0 px-0 py-1">
+        <label class="form-check mr-hoa-filter-check d-flex align-items-start gap-2 mb-0">
+          <input class="form-check-input attr-value-check flex-shrink-0 mt-1" data-attr="{{ $index }}" data-attrval="{{ $value_index }}" {{ $value['selected'] ? 'checked' : '' }} name="6" type="checkbox" value="{{ $value['id'] }}">
+          <span class="mr-hoa-filter-check-label">{{ $value['name'] }}</span>
         </label>
       </li>
       @endforeach
@@ -87,14 +68,23 @@
 @push('add-scripts')
 <script>
   const currencyRate = {{ current_currency_rate() }};
+  const isVnd = {{ system_setting('base.currency') === 'VND' ? 'true' : 'false' }};
+  function formatMoneyInput(n) {
+    const raw = String(n ?? '').replace(/\D/g, '');
+    const v = Math.round(Number(raw || 0));
+    if (!isVnd) return String(v);
+    return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
   $(document).ready(function() {
     if (!$('#price-slider').length) {
       return;
     }
 
+    const priceStep = isVnd ? 1000 : 0.01;
+
     $("#price-slider").slider({
       range: true,
-      step: 0.01,
+      step: priceStep,
       min: {{ $filter_data['price']['min'] ?? 0 }},
       max: {{ $filter_data['price']['max'] ?? 0 }},
       values: [{{ $filter_data['price']['select_min'] }}, {{ $filter_data['price']['select_max'] }}],
@@ -102,8 +92,10 @@
         filterProductData();
       },
       slide: function(event, ui) {
-        $('.price-select-min').val((ui.values[0] * currencyRate).toFixed(2));
-        $('.price-select-max').val((ui.values[1] * currencyRate).toFixed(2));
+        const a = Math.round(ui.values[0] * currencyRate);
+        const b = Math.round(ui.values[1] * currencyRate);
+        $('.price-select-min').val(isVnd ? formatMoneyInput(a) : a.toFixed(2));
+        $('.price-select-max').val(isVnd ? formatMoneyInput(b) : b.toFixed(2));
       }
     });
 
@@ -112,8 +104,17 @@
     });
 
     $('.price-select-min, .price-select-max').on('input', function() {
-      this.value = this.value.replace(/[^0-9.]/g, '');
+      if (isVnd) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+      } else {
+        this.value = this.value.replace(/[^0-9.]/g, '');
+      }
     });
+
+    if (isVnd) {
+      $('.price-select-min').val(function (_, v) { return formatMoneyInput(v); });
+      $('.price-select-max').val(function (_, v) { return formatMoneyInput(v); });
+    }
   })
 
   $('.child-category').each(function(index, el) {

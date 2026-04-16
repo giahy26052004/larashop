@@ -11,7 +11,6 @@
 
 namespace Database\Seeders;
 
-use Beike\Models\Brand;
 use Beike\Models\Currency;
 use Illuminate\Database\Seeder;
 
@@ -37,37 +36,18 @@ class CurrenciesSeeder extends Seeder
 
     public function getItems()
     {
+        // Chỉ VND — shop không bật loại tiền khác (có thể thêm tay trong admin nếu cần).
         return [
             [
-                "id" => 1,
-                "name" => "人民币",
-                "code" => "CNY",
-                "symbol_left" => "￥",
-                "symbol_right" => "",
-                "decimal_place" => 2,
-                "value" => 7.1121,
-                "status" => 1,
+                'id'              => 1,
+                'name'            => 'Việt Nam Đồng',
+                'code'            => 'VND',
+                'symbol_left'     => '',
+                'symbol_right'    => 'đ',
+                'decimal_place'   => 0,
+                'value'           => 1,
+                'status'          => 1,
             ],
-            [
-                "id" => 2,
-                "name" => "USD",
-                "code" => "USD",
-                "symbol_left" => "$",
-                "symbol_right" => "",
-                "decimal_place" => 2,
-                "value" => 1,
-                "status" => 1,
-            ],
-            [
-                "id" => 3,
-                "name" => "欧元",
-                "code" => "EUR",
-                "symbol_left" => "€",
-                "symbol_right" => "",
-                "decimal_place" => 2,
-                "value" => 0.9790,
-                "status" => 1,
-            ]
         ];
     }
 }

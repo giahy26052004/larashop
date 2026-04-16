@@ -937,7 +937,7 @@ class ThemeSeeder extends Seeder
                             [
                                 "title" => [
                                     "zh_cn" =>"时尚单品",
-                                    "en" =>"Fashion sheet"
+                                    "en" =>"Kiểu bó nổi bật"
                                 ],
                                 "products" =>[
                                     5,
@@ -953,7 +953,7 @@ class ThemeSeeder extends Seeder
                             [
                                 "title" => [
                                     "zh_cn" =>"潮流穿搭",
-                                    "en" =>"Trendy outfits"
+                                    "en" =>"Hoa mới về"
                                 ],
                                 "products" =>[
                                     39,
@@ -969,7 +969,7 @@ class ThemeSeeder extends Seeder
                             [
                                 "title" => [
                                     "zh_cn" =>"最新促销",
-                                    "en" =>"Promotions"
+                                    "en" =>"Ưu đãi"
                                 ],
                                 "products" =>[
                                     1,
@@ -985,7 +985,7 @@ class ThemeSeeder extends Seeder
                         ],
                         "title" => [
                             "zh_cn" =>"推荐商品",
-                            "en" =>"Fashion items"
+                            "en" =>"Gợi ý cho bạn"
                         ]
                     ],
                     "module_id" =>"s6e7e3vucriazzbi",

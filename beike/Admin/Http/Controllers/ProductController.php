@@ -9,6 +9,7 @@ use Beike\Admin\Http\Resources\ProductSimple;
 use Beike\Admin\Repositories\TaxClassRepo;
 use Beike\Admin\Services\ProductService;
 use Beike\Libraries\Weight;
+use Beike\Models\Attribute;
 use Beike\Models\Product;
 use Beike\Repositories\CategoryRepo;
 use Beike\Repositories\FlattenCategoryRepo;
@@ -85,6 +86,7 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
             $requestData = $request->all();
+            $requestData['attributes'] = $this->normalizeTagAttributes($requestData);
             $actionType  = $requestData['action_type'] ?? '';
             $product     = (new ProductService)->create($requestData);
 
@@ -115,6 +117,7 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
             $requestData = $request->all();
+            $requestData['attributes'] = $this->normalizeTagAttributes($requestData);
             $actionType  = $requestData['action_type'] ?? '';
             $product     = (new ProductService)->update($product, $requestData);
 
@@ -169,6 +172,33 @@ class ProductController extends Controller
         $taxClasses = TaxClassRepo::getList();
         array_unshift($taxClasses, ['title' => trans('admin/builder.text_no'), 'id' => 0]);
 
+        $flowerTagAttributes = Attribute::query()
+            ->with(['description', 'values.description', 'attributeGroup.description'])
+            ->whereHas('attributeGroup.description', function ($query) {
+                $query->where('locale', locale())->whereIn('name', ['Tag bộ lọc', 'Tag bo loc']);
+            })
+            ->orderBy('id')
+            ->get()
+            ->map(function ($attribute) {
+                return [
+                    'id' => $attribute->id,
+                    'name' => $attribute->description->name ?? '',
+                    'values' => $attribute->values->map(function ($value) {
+                        return [
+                            'id' => $value->id,
+                            'name' => $value->description->name ?? '',
+                        ];
+                    })->toArray(),
+                ];
+            })->toArray();
+
+        $selectedTagValueIds = [];
+        if ($product->id) {
+            foreach ($product->attributes as $productAttribute) {
+                $selectedTagValueIds[$productAttribute->attribute_id][] = $productAttribute->attribute_value_id;
+            }
+        }
+
         $data = [
             'product'               => $product,
             'descriptions'          => $descriptions ?? [],
@@ -177,19 +207,38 @@ class ProductController extends Controller
             'relations'             => ProductResource::collection($product->relations)->resource,
             'languages'             => LanguageRepo::all(),
             'tax_classes'           => $taxClasses,
-            'system_currency'           => system_setting('base.currency', 'USD'),
+            'system_currency'           => system_setting('base.currency', 'VND'),
             'system_weight'           => system_setting('base.weight', 'kg'),
             'weight_classes'        => Weight::getWeightUnits(),
             'source'                => [
                 'flatten_categories' => FlattenCategoryRepo::getCategoryList(),
                 'categories'         => CategoryRepo::flatten(locale(), false),
             ],
+            'flower_tag_attributes' => $flowerTagAttributes,
+            'selected_tag_value_ids' => $selectedTagValueIds,
             '_redirect'          => $this->getRedirect(),
         ];
 
         $data = hook_filter('admin.product.form.data', $data);
 
         return view('admin::pages.products.form.form', $data);
+    }
+
+    private function normalizeTagAttributes(array $requestData): array
+    {
+        $attributes = $requestData['attributes'] ?? [];
+        $tagValues = $requestData['tag_attribute_values'] ?? [];
+
+        foreach ($tagValues as $attributeId => $valueIds) {
+            foreach ((array) $valueIds as $valueId) {
+                $attributes[] = [
+                    'attribute_id' => (int) $attributeId,
+                    'attribute_value_id' => (int) $valueId,
+                ];
+            }
+        }
+
+        return $attributes;
     }
 
     public function name(int $id)

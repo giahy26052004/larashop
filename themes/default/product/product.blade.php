@@ -101,6 +101,20 @@
           @hook('product.detail.price.after')
 
           @endhookwrapper
+
+          @if (!request('iframe'))
+            <div class="mr-hoa-gift-note">
+              <label class="form-label small fw-semibold mb-1" for="mrhoa-gift-note">{{ __('shop/mrhoa.gift_note_label') }}</label>
+              <textarea class="form-control" id="mrhoa-gift-note" rows="2"
+                        placeholder="{{ __('shop/mrhoa.gift_note_placeholder') }}"></textarea>
+              <p class="small text-muted mb-0 mt-1">{{ __('shop/mrhoa.gift_note_hint') }}</p>
+            </div>
+            <div class="mr-hoa-trust-strip">
+              <span>{{ __('shop/mrhoa.trust_fresh') }}</span>
+              <span>{{ __('shop/mrhoa.trust_pack') }}</span>
+            </div>
+          @endif
+
           <div class="stock-and-sku mb-lg-4 mb-2">
             @hook('shop.product.detail.quantity.before')
 
@@ -113,15 +127,6 @@
               </span>
             </div>
             @endhookwrapper
-
-            @if ($product['brand_id'])
-              @hookwrapper('product.detail.brand')
-              <div class="d-lg-flex">
-                <span class="title text-muted">{{ __('product.brand') }}:</span>
-                <a href="{{ shop_route('brands.show', $product['brand_id']) }}">{{ $product['brand_name'] }}</a>
-              </div>
-              @endhookwrapper
-            @endif
 
             @hookwrapper('product.detail.sku')
             <div class="d-lg-flex"><span class="title text-muted">SKU:</span>@{{ product.sku }}</div>
@@ -568,6 +573,21 @@
     const selectedVariants = variables.map((variable, index) => {
       return variable.values[selectedVariantsIndex[index]]
     });
+
+    (function () {
+      var ta = document.getElementById('mrhoa-gift-note');
+      if (!ta) return;
+      try {
+        var k = 'mrhoa_gift_note';
+        if (sessionStorage.getItem(k)) {
+          ta.value = sessionStorage.getItem(k);
+        }
+        ta.addEventListener('input', function () {
+          sessionStorage.setItem(k, ta.value);
+        });
+      } catch (e) {
+      }
+    })();
 
     @hook('product.detail.script.after')
   </script>

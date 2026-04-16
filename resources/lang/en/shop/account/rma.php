@@ -10,11 +10,11 @@
  */
 
 return [
-    'index'         => 'RMA',
-    'commodity'     => 'Commodity',
-    'quantity'      => 'Quantity',
-    'service_type'  => 'Service Type',
-    'return_reason' => 'Reason For Return',
-    'creation_time' => 'Creation Time',
-    'check'         => 'Check',
+    'index'         => 'Đổi trả & bảo hành',
+    'commodity'     => 'Sản phẩm',
+    'quantity'      => 'Số lượng',
+    'service_type'  => 'Loại dịch vụ',
+    'return_reason' => 'Lý do trả hàng',
+    'creation_time' => 'Thời gian tạo',
+    'check'         => 'Xem',
 ];

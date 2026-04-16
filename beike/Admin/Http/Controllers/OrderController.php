@@ -164,6 +164,57 @@ class OrderController extends Controller
         return json_success(trans('common.deleted_success'));
     }
 
+    /**
+     * Soft-delete nhiều đơn hàng (chỉ bản ghi chưa xóa).
+     */
+    public function destroyByIds(Request $request): JsonResponse
+    {
+        $ids = $request->get('ids', []);
+        if (! is_array($ids)) {
+            $ids = [];
+        }
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+        if (empty($ids)) {
+            return json_fail(trans('common.error_form'));
+        }
+
+        $orders = Order::query()->whereIn('id', $ids)->whereNull('deleted_at')->get();
+        foreach ($orders as $order) {
+            $order->delete();
+            hook_action('admin.order.destroy.after', $order);
+        }
+
+        hook_action('admin.order.destroy_by_ids.after', $ids);
+
+        return json_success(trans('common.deleted_success'), []);
+    }
+
+    /**
+     * Khôi phục nhiều đơn hàng từ thùng rác.
+     */
+    public function restoreByIds(Request $request): JsonResponse
+    {
+        $ids = $request->get('ids', []);
+        if (! is_array($ids)) {
+            $ids = [];
+        }
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+        if (empty($ids)) {
+            return json_fail(trans('common.error_form'));
+        }
+
+        foreach ($ids as $id) {
+            $order = Order::onlyTrashed()->find($id);
+            if ($order) {
+                $order->restore();
+            }
+        }
+
+        hook_action('admin.order.restore_by_ids.after', $ids);
+
+        return json_success(trans('common.updated_success'), []);
+    }
+
     public function restore(Request $request)
     {
         $id = $request->id ?? 0;

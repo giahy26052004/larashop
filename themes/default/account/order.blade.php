@@ -3,6 +3,16 @@
 @section('body-class', 'page-account-order-list')
 
 @section('content')
+  @php
+    $statusClassMap = [
+      'unpaid' => 'bg-warning text-dark',
+      'paid' => 'bg-success',
+      'shipped' => 'bg-info text-dark',
+      'completed' => 'bg-primary',
+      'cancelled' => 'bg-danger',
+    ];
+  @endphp
+
   <x-shop-breadcrumb type="static" value="account.order.index" />
 
   <div class="container">
@@ -46,7 +56,9 @@
                           @if ($loop->first)
                             <td rowspan="{{ $loop->count }}">
                               {{ currency_format($order->total, $order->currency_code, $order->currency_value) }}</td>
-                            <td rowspan="{{ $loop->count }}">{{$order->status_format}}</td>
+                            <td rowspan="{{ $loop->count }}">
+                              <span class="badge {{ $statusClassMap[$order->status] ?? 'bg-secondary' }}">{{ $order->status_format }}</span>
+                            </td>
                             <td rowspan="{{ $loop->count }}" class="text-end">
                               @hook('account.order.actions', $order)
 
@@ -85,7 +97,7 @@
               <div class="card-body">
                 <div class="header-wrapper d-flex justify-content-between">
                   <div>{{ __('shop/account/order.order_number') }}：{{ $order->number }}</div>
-                  <div>{{ $order->status_format }}</div>
+                  <div><span class="badge {{ $statusClassMap[$order->status] ?? 'bg-secondary' }}">{{ $order->status_format }}</span></div>
                 </div>
                 <div class="content-wrapper">
                   <div class="order-product-wrap mb-2" onclick="window.location.href='{{ shop_route('account.order.show', ['number' => $order->number]) }}'">

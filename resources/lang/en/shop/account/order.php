@@ -10,12 +10,12 @@
  */
 
 return [
-    'index'         => 'Order',
-    'completed'     => 'Completed',
-    'cancelled'     => 'Cancelled',
-    'order_details' => 'Order Details',
-    'amount'        => 'Amount',
-    'state'         => 'State',
-    'order_number'  => 'Order Number',
-    'check'         => 'Check',
+    'index'         => 'Đơn hàng',
+    'completed'     => 'Hoàn tất',
+    'cancelled'     => 'Đã hủy',
+    'order_details' => 'Chi tiết đơn hàng',
+    'amount'        => 'Số tiền',
+    'state'         => 'Trạng thái',
+    'order_number'  => 'Mã đơn hàng',
+    'check'         => 'Xem',
 ];

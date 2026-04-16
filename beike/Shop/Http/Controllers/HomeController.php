@@ -2,6 +2,7 @@
 
 namespace Beike\Shop\Http\Controllers;
 
+use Beike\Repositories\ProductRepo;
 use Beike\Services\DesignService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -27,6 +28,11 @@ class HomeController extends Controller
 
         $designSettings = system_setting('base.design_setting');
         $modules        = $designSettings['modules'] ?? [];
+
+        $allowedCodes = ['slideshow', 'img_text_banner', 'product', 'tab_product', 'latest'];
+        $modules       = array_filter($modules, function ($module) use ($allowedCodes) {
+            return in_array($module['code'] ?? '', $allowedCodes, true);
+        });
 
         $moduleItems = [];
         foreach ($modules as $module) {
@@ -65,11 +71,100 @@ class HomeController extends Controller
             }
         }
 
+        if (empty($moduleItems)) {
+            $moduleItems = $this->buildMinimalHomeModules();
+        }
+
         $data = ['modules' => $moduleItems];
 
         $data = hook_filter('home.index.data', $data);
 
         return view('home', $data);
+    }
+
+    /**
+     * Fallback khi chưa cấu hình module trang chủ trong admin.
+     * Sản phẩm lấy theo danh mục (nếu cấu hình), không thì mới nhất toàn shop — xem resolveHomeNewProductCategoryIds().
+     */
+    private function buildMinimalHomeModules(): array
+    {
+        $limit        = (int) system_setting('base.home_new_products_limit', 8);
+        $limit        = $limit > 0 ? $limit : 8;
+        $categoryIds  = $this->resolveHomeNewProductCategoryIds();
+
+        $filters = [
+            'active' => 1,
+            'sort'   => 'created_at',
+            'order'  => 'desc',
+        ];
+        if ($categoryIds !== []) {
+            $filters['category_id'] = $categoryIds;
+        }
+
+        $productIds = ProductRepo::getBuilder($filters)
+            ->whereHas('masterSku')
+            ->limit($limit)
+            ->pluck('products.id')
+            ->unique()
+            ->values()
+            ->toArray();
+
+        if (! $productIds) {
+            return [];
+        }
+
+        return [
+            [
+                'code'      => 'product',
+                'module_id' => 'minimal-home-products',
+                'view_path' => 'design.product',
+                'content'   => [
+                    'module_size' => 'container-fluid',
+                    'title'       => 'Hoa mới',
+                    'products'    => ProductRepo::getProductsByIds($productIds)->jsonSerialize(),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * ID danh mục dùng cho block "Hoa mới" (fallback): ưu tiên cài đặt hệ thống, sau đó env MRHOA_HOME_NEW_CATEGORY_IDS.
+     * Rỗng = không lọc category (mới nhất toàn cửa hàng).
+     *
+     * @return int[]
+     */
+    private function resolveHomeNewProductCategoryIds(): array
+    {
+        $raw = system_setting('base.home_new_products_category_ids', config('mrhoa.home_new_products_category_ids', []));
+
+        return $this->normalizeIdList($raw);
+    }
+
+    /**
+     * @param  mixed  $raw  mảng ID, JSON "[1,2]", hoặc chuỗi "1,2,3"
+     * @return int[]
+     */
+    private function normalizeIdList(mixed $raw): array
+    {
+        if ($raw === null || $raw === '') {
+            return [];
+        }
+        if (is_array($raw)) {
+            return array_values(array_unique(array_filter(array_map('intval', $raw))));
+        }
+        if (is_string($raw)) {
+            $decoded = json_decode($raw, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return array_values(array_unique(array_filter(array_map('intval', $decoded))));
+            }
+
+            return array_values(array_unique(array_filter(array_map(
+                'intval',
+                preg_split('/[\s,]+/', trim($raw), -1, PREG_SPLIT_NO_EMPTY)
+            ))));
+        }
+
+        return [];
     }
 
     private function redirect(): RedirectResponse

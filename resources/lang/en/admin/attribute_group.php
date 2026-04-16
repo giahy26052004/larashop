@@ -10,14 +10,14 @@
  */
 
 return [
-    'index'                              => 'Attribute group',
-    'create_at_groups'                   => 'Create',
-    'error_cannot_delete_attribute_used' => 'Attribute Group used by attribute (ID: :attributes), can not be deleted!',
-    'error_cannot_delete_default_group'  => 'The attribute group with ID 1 is the default attribute group and cannot be deleted.',
+    'index'                              => 'Nhóm thuộc tính',
+    'create_at_groups'                   => 'Tạo mới',
+    'error_cannot_delete_attribute_used' => 'Nhóm đang chứa thuộc tính (ID: :attributes), không thể xóa!',
+    'error_cannot_delete_default_group'  => 'Nhóm mặc định (ID 1) không thể xóa.',
 
-    'attribute_groups_index'             => 'Index',
-    'attribute_groups_create'            => 'Create',
-    'attribute_groups_show'              => 'Details',
-    'attribute_groups_update'            => 'Update',
-    'attribute_groups_delete'            => 'Delete',
+    'attribute_groups_index'             => 'Danh sách',
+    'attribute_groups_create'            => 'Thêm mới',
+    'attribute_groups_show'              => 'Chi tiết',
+    'attribute_groups_update'            => 'Cập nhật',
+    'attribute_groups_delete'            => 'Xóa',
 ];

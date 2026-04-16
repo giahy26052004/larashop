@@ -16,9 +16,12 @@ use Illuminate\Http\Request;
 
 class ZoneController extends Controller
 {
-    public function index(Request $request, int $countryId)
+    public function index(Request $request, $countryId)
     {
-        ZoneRepo::listByCountry($countryId);
+        $countryId = (int) $countryId;
+        if ($countryId <= 0) {
+            return json_fail(trans('common.error_form'));
+        }
 
         $data = [
             'zones' => ZoneRepo::listByCountry($countryId),

@@ -218,10 +218,14 @@ class OrderRepo
             $shippingAddress = $shippingAddressId ? Address::query()->findOrFail($shippingAddressId) : new Address();
             $paymentAddress  = Address::query()->findOrFail($paymentAddressId);
             $email           = $customer->email;
+            $customerName    = $customer->name ?? '';
         } else {
-            $shippingAddress = new Address($current['guest_shipping_address'] ?? []);
-            $paymentAddress  = new Address($current['guest_payment_address'] ?? []);
-            $email           = ($current['guest_shipping_address']['email'] ?? $current['guest_payment_address']['email']) ?? '';
+            $guestShippingAddress = self::normalizeGuestAddress($current['guest_shipping_address'] ?? []);
+            $guestPaymentAddress  = self::normalizeGuestAddress($current['guest_payment_address'] ?? []);
+            $shippingAddress      = new Address($guestShippingAddress);
+            $paymentAddress       = new Address($guestPaymentAddress);
+            $email                = ($guestShippingAddress['email'] ?? $guestPaymentAddress['email']) ?? '';
+            $customerName         = $guestShippingAddress['name'] ?? ($guestPaymentAddress['name'] ?? '');
         }
         $shippingAddress->country_name = $shippingAddress->country->name ?? '';
         $shippingAddress->country_id   = $shippingAddress->country->id   ?? 0;
@@ -244,7 +248,7 @@ class OrderRepo
             'customer_group_id'      => $customer->customer_group_id ?? 0,
             'shipping_address_id'    => $shippingAddress->id         ?? 0,
             'payment_address_id'     => $paymentAddress->id          ?? 0,
-            'customer_name'          => $customer->name              ?? '',
+            'customer_name'          => $customerName,
             'email'                  => $email,
             'calling_code'           => $customer->calling_code ?? 0,
             'telephone'              => $customer->telephone    ?? '',
@@ -291,6 +295,25 @@ class OrderRepo
         hook_filter('repository.order.create.after', ['order' => $order, 'data' => $data]);
 
         return $order;
+    }
+
+    /**
+     * guest_*_address có thể là array hoặc JSON string; chuẩn hóa về array.
+     */
+    private static function normalizeGuestAddress($address): array
+    {
+        if (is_array($address)) {
+            return $address;
+        }
+
+        if (is_string($address)) {
+            $decoded = json_decode($address, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return [];
     }
 
     /**

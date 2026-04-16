@@ -10,12 +10,13 @@
  */
 
 return [
-    'index'                 => 'Edit',
-    'modify_avatar'         => 'Profile Picture',
-    'suggest'               => 'Upload a JPG or PNG image. 300 x 300 is recommended.',
-    'name'                  => 'Name',
+    'index'                 => 'Chỉnh sửa thông tin',
+    'modify_avatar'         => 'Ảnh đại diện',
+    'suggest'               => 'Tải ảnh JPG hoặc PNG. Khuyến nghị 300 × 300 pixel.',
+    'name'                  => 'Họ tên',
     'email'                 => 'Email',
-    'crop'                  => 'Crop',
-    'password_edit_success' => 'Change password successfully!',
-    'origin_password_fail'  => 'Origin password incorrect!',
+    'crop'                  => 'Cắt ảnh',
+    'password_edit_success' => 'Đổi mật khẩu thành công!',
+    'origin_password_fail'  => 'Mật khẩu hiện tại không đúng!',
+    'change_avatar_tooltip' => 'Đổi ảnh đại diện',
 ];

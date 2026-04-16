@@ -10,6 +10,8 @@
     @include($module['view_path'], $module)
   @endforeach
 
+  @include('shared.mr_hoa_home_extras')
+
   @hook('home.modules.after')
 
 </div>

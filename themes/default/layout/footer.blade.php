@@ -31,9 +31,9 @@
             <h6 class="text-uppercase text-dark intro-title">{{ __('shop/common.company_profile') }}<span class="icon-open"><i class="bi bi-plus-lg"></i></span></h6>
             <div class="intro-wrap">
               @if ($footer_content['content']['intro']['logo'] ?? false)
-                <div class="logo"><a href="{{ shop_route('home.index') }}"><img src="{{ image_origin($footer_content['content']['intro']['logo']) }}" alt="{{ system_setting('base.meta_title', 'BeikeShop开源好用的跨境电商系统') }}" class="img-fluid"></a></div>
+                <div class="logo"><a href="{{ shop_route('home.index') }}"><img src="{{ image_origin($footer_content['content']['intro']['logo']) }}" alt="{{ system_setting('base.meta_title', __('common.site_default_title')) }}" class="img-fluid"></a></div>
               @endif
-              <div class="text tinymce-format-p">{!! $footer_content['content']['intro']['text'][locale()] ?? '' !!}</div>
+              <div class="text tinymce-format-p">{!! mrhoa_footer_intro_html((string) ($footer_content['content']['intro']['text'][locale()] ?? '')) !!}</div>
               <div class="social-network">
                 @foreach ($footer_content['content']['intro']['social_network'] ?? [] as $item)
                 <a href="{{ $item['link'] }}" target="_blank"><img src="{{ image_origin($item['image']) }}" class="img-fluid"></a>
@@ -48,13 +48,13 @@
           @endphp
           @if ($design || ($link['title'][locale()] ?? false))
           <div class="col-12 col-md footer-content-link{{ $i }} footer-link-wrap">
-            <h6 class="text-uppercase text-dark">{{ $link['title'][locale()] ?? '' }}<span class="icon-open"><i class="bi bi-plus-lg"></i></span></h6>
+            <h6 class="text-uppercase text-dark">{{ shop_ui_vietnamese((string) ($link['title'][locale()] ?? '')) }}<span class="icon-open"><i class="bi bi-plus-lg"></i></span></h6>
             <ul class="list-unstyled">
               @foreach ($link['links'] as $item)
                 @if ($item['link'])
                 <li class="lh-lg mb-2">
                   <a href="{{ $item['link'] }}" @if (isset($item['new_window']) && $item['new_window']) target="_blank" @endif>
-                    {{ $item['text'] }}
+                    {{ shop_ui_vietnamese((string) $item['text']) }}
                   </a>
                 </li>
               @endif
@@ -70,13 +70,13 @@
           <h6 class="text-uppercase text-dark">{{ __('common.contact_us') }}<span class="icon-open"><i class="bi bi-plus-lg"></i></span> </h6>
           <ul class="list-unstyled">
             @if ($footer_content['content']['contact']['email'])
-              <li class="lh-lg mb-2"><i class="bi bi-envelope-fill"></i> {{ $footer_content['content']['contact']['email'] }}</li>
+              <li class="lh-lg mb-2"><i class="bi bi-envelope-fill"></i> {{ preg_replace('/\s+/', '', (string) $footer_content['content']['contact']['email']) }}</li>
             @endif
             @if ($footer_content['content']['contact']['telephone'])
               <li class="lh-lg mb-2"><i class="bi bi-telephone-fill"></i> {{ $footer_content['content']['contact']['telephone'] }}</li>
             @endif
             @if ($footer_content['content']['contact']['address'][locale()] ?? '')
-              <li class="lh-lg mb-2"><i class="bi bi-geo-alt-fill"></i> {{ $footer_content['content']['contact']['address'][locale()] ?? '' }}</li>
+              <li class="lh-lg mb-2"><i class="bi bi-geo-alt-fill"></i> {{ shop_ui_vietnamese(trim((string) ($footer_content['content']['contact']['address'][locale()] ?? ''))) }}</li>
             @endif
           </ul>
         </div>
@@ -91,10 +91,6 @@
     <div class="container-fluid">
       <div class="d-lg-flex align-items-center">
         <div class="text-center d-lg-flex justify-content-center">
-          <!-- 删除版权信息, 请先购买授权 https://beikeshop.com/service -->
-          @if(!check_license())
-          Powered By&nbsp;<a href="https://beikeshop.com/" target="_blank" rel="noopener">BeikeShop</a>&nbsp;-&nbsp;
-          @endif
           {!! $footer_content['bottom']['copyright'][locale()] ?? '' !!}
         </div>
         @if (isset($footer_content['bottom']['image']) && $footer_content['bottom']['image'])

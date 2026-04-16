@@ -27,21 +27,49 @@ class MenuRepo
         }
 
         $locale = locale();
-        $menus  = $menuSetting['menus'];
+        $menus  = $menuSetting['menus'] ?? [];
 
         foreach ($menus as $index => $menu) {
-            $menu['new_window']    = $menu['link']['new_window']        ?? false;
-            $menu['link']          = handle_link($menu['link'])['link'] ?? '';
-            $menu['name']          = $menu['name'][$locale]             ?? '';
-            $menu['badge']['name'] = $menu['badge']['name'][$locale]    ?? '';
+            $menuLink             = $menu['link'] ?? [];
+            $menuName             = $menu['name'] ?? ($menu['title'] ?? []);
+            $menuBadgeName        = $menu['badge']['name'] ?? [];
+            $menu['new_window']   = $menuLink['new_window'] ?? false;
+            $menu['link']         = handle_link($menuLink)['link'] ?? '';
+            if (empty($menu['link']) && (($menuLink['type'] ?? '') === 'home')) {
+                $menu['link'] = shop_route('home.index');
+            }
+            $menu['name']         = shop_ui_vietnamese(is_array($menuName) ? ($menuName[$locale] ?? '') : (string) $menuName);
+            $menu['badge']['name'] = shop_ui_vietnamese(is_array($menuBadgeName) ? ($menuBadgeName[$locale] ?? '') : (string) $menuBadgeName);
 
-            if ($menu['childrenGroup']) {
-                $menu['children_group'] = self::handleChildrenGroup($menu['childrenGroup']);
+            $childrenGroup = $menu['childrenGroup'] ?? [];
+            if ($childrenGroup) {
+                $menu['children_group'] = self::handleChildrenGroup($childrenGroup);
             }
             $menus[$index] = $menu;
         }
 
+        $menus = self::filterHiddenHeaderMenus($menus);
+
         return $menus;
+    }
+
+    /**
+     * @param  array<int, array>  $menus
+     * @return array<int, array>
+     */
+    private static function filterHiddenHeaderMenus(array $menus): array
+    {
+        $hide = config('mrhoa.hide_header_menu_names', []);
+        if (! is_array($hide) || $hide === []) {
+            return $menus;
+        }
+        $hideLower = array_map(fn ($s) => mb_strtolower(trim((string) $s), 'UTF-8'), $hide);
+
+        return array_values(array_filter($menus, function ($menu) use ($hideLower) {
+            $n = mb_strtolower(trim((string) ($menu['name'] ?? '')), 'UTF-8');
+
+            return $n === '' || ! in_array($n, $hideLower, true);
+        }));
     }
 
     /**
@@ -55,13 +83,14 @@ class MenuRepo
     {
         $locale = locale();
         foreach ($childrenGroups as $groupIndex => $childrenGroup) {
-            $childrenGroup['name'] = $childrenGroup['name'][$locale] ?? '';
-            if ($childrenGroup['type'] == 'image') {
+            $groupName             = $childrenGroup['name'] ?? ($childrenGroup['title'] ?? []);
+            $childrenGroup['name'] = shop_ui_vietnamese(is_array($groupName) ? ($groupName[$locale] ?? '') : (string) $groupName);
+            if (($childrenGroup['type'] ?? '') == 'image') {
                 $childrenGroup['image']['image'] = image_origin($childrenGroup['image']['image'][$locale] ?? '');
-                $childrenGroup['image']['link']  = type_route($childrenGroup['image']['link']['type'], $childrenGroup['image']['link']['value']);
-            } elseif ($childrenGroup['children']) {
-                foreach ($childrenGroup['children'] as $childrenIndex => $children) {
-                    $children['link']                          = handle_link($children['link']);
+                $childrenGroup['image']['link']  = type_route($childrenGroup['image']['link']['type'] ?? '', $childrenGroup['image']['link']['value'] ?? '');
+            } elseif (!empty($childrenGroup['children'])) {
+                foreach (($childrenGroup['children'] ?? []) as $childrenIndex => $children) {
+                    $children['link']                           = handle_link($children['link'] ?? []);
                     $childrenGroup['children'][$childrenIndex] = $children;
                 }
             }

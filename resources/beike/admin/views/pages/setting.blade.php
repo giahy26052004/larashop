@@ -32,19 +32,7 @@
             <a class="nav-link active" data-bs-toggle="tab" href="#tab-general">{{ __('admin/setting.basic_settings') }}</a>
           </li>
           <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#tab-store">{{ __('admin/setting.store_settings') }}</a>
-          </li>
-          <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#tab-checkout">{{ __('admin/setting.checkout_settings') }}</a>
-          </li>
-          <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#tab-image">{{ __('admin/setting.picture_settings') }}</a>
-          </li>
-          <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#tab-express-company">{{ __('order.express_company') }}</a>
-          </li>
-          <li class="nav-item" role="presentation">
-            <a class="nav-link" data-bs-toggle="tab" href="#tab-mail">{{ __('admin/setting.mail_settings') }}</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#tab-image">{{ __('admin/guide.button_setting_logo') }}</a>
           </li>
           @hook('admin.setting.nav.after')
         </ul>
@@ -58,88 +46,62 @@
             <x-admin-form-textarea name="meta_keywords" title="{{ __('admin/setting.meta_keywords') }}" value="{{ old('meta_keywords', system_setting('base.meta_keywords', '')) }}" />
             <x-admin-form-input name="telephone" title="{{ __('admin/setting.telephone') }}" value="{{ old('telephone', system_setting('base.telephone', '')) }}" />
             <x-admin-form-input name="email" title="{{ __('admin/setting.email') }}" value="{{ old('email', system_setting('base.email', '')) }}" />
-            <x-admin::form.row title="{{ __('admin/setting.license_code') }}">
-              <div class="input-group wp-400">
-                <input type="text" class="form-control text-uppercase bg-light" name="license_code" placeholder="{{ __('admin/setting.license_code') }}" value="{{ old('license_code', system_setting('base.license_code', '')) }}" readonly="readonly">
-                <button class="btn btn-outline-primary get-license-code" type="button">{{ __('admin/setting.license_code_get') }}</button>
+            <x-admin-form-input name="home_promo_title" title="Tiêu đề banner trang chủ" value="{{ old('home_promo_title', system_setting('base.home_promo_title', '')) }}" />
+            <x-admin-form-textarea name="home_promo_description" title="Mô tả banner trang chủ" value="{{ old('home_promo_description', system_setting('base.home_promo_description', '')) }}" />
+            <x-admin::form.row title="Ảnh banner trang chủ">
+              <div class="open-crop cursor-pointer bg-light wh-80 border d-flex justify-content-center align-items-center me-2 mb-2 position-relative" ratio="16/9">
+                <img src="{{ image_resize(old('home_promo_image', system_setting('base.home_promo_image', '')), 120, 80) }}" class="img-fluid">
               </div>
+              <input type="hidden" value="{{ old('home_promo_image', system_setting('base.home_promo_image', '')) }}" name="home_promo_image">
+              <div class="help-text font-size-12 lh-base">Ảnh riêng cho khối giới thiệu trên trang chủ.</div>
             </x-admin::form.row>
 
-            <x-admin-form-switch name="guide" title="{{ __('admin/guide.heading_title') }}" value="{{ old('guide', system_setting('base.guide', '1')) }}" />
-            <x-admin-form-switch name="maintenance_mode" title="{{ __('admin/maintenance.heading_title') }}" value="{{ old('maintenance_mode', system_setting('base.maintenance_mode', '0')) }}" />
+            <hr class="my-4">
+
+            <x-admin::form.row title="QR chuyển khoản">
+              <div class="open-crop cursor-pointer bg-light wh-80 border d-flex justify-content-center align-items-center me-2 mb-2 position-relative" ratio="1/1">
+                <img src="{{ image_resize(old('bank_qr_image', system_setting('base.bank_qr_image', ''))) }}" class="img-fluid">
+              </div>
+              <input type="hidden" value="{{ old('bank_qr_image', system_setting('base.bank_qr_image', '')) }}" name="bank_qr_image">
+              <div class="help-text font-size-12 lh-base">Tải ảnh QR để khách quét chuyển khoản.</div>
+            </x-admin::form.row>
+
+            <x-admin-form-textarea
+              name="bank_transfer_info"
+              title="Thông tin chuyển khoản"
+              value="{{ old('bank_transfer_info', system_setting('base.bank_transfer_info', '')) }}" />
+
+            <hr class="my-4">
+            <h6 class="mb-3">Giỏ hàng (shop) — phí giao dự kiến</h6>
+            <x-admin-form-input
+              name="cart_shipping_estimate"
+              title="Phí giao hàng ước tính (số, theo đơn vị tiền tệ hiện tại)"
+              value="{{ old('cart_shipping_estimate', system_setting('base.cart_shipping_estimate', '30000')) }}"
+              placeholder="30000"
+            />
+            <div class="help-text font-size-12 lh-base mb-3">Hiển thị ở cột tổng <strong>giỏ hàng</strong> (ước tính). Trang <strong>thanh toán</strong> chỉ dùng một bảng tổng từ hệ thống; không lặp lại các dòng tiền ở đây.</div>
+            <x-admin-form-input
+              name="cart_shipping_line_title"
+              title="Tiêu đề dòng phí giao"
+              value="{{ old('cart_shipping_line_title', system_setting('base.cart_shipping_line_title', 'Phí giao hàng (30.000₫)')) }}"
+            />
+            <x-admin-form-textarea
+              name="cart_shipping_notice"
+              title="Mô tả phí giao (hiển thị dưới tiêu đề)"
+              value="{{ old('cart_shipping_notice', system_setting('base.cart_shipping_notice', 'Phí cố định 30.000₫. Lara Flowers sẽ xác nhận lại phí giao hàng theo khu vực (nếu có) và thông báo cho khách hàng.')) }}"
+            />
+            <x-admin-form-textarea
+              name="cart_shipping_checkout_note"
+              title="Ghi chú nhỏ (dưới phí giao)"
+              value="{{ old('cart_shipping_checkout_note', system_setting('base.cart_shipping_checkout_note', '')) }}"
+            />
+            <x-admin-form-textarea
+              name="checkout_transfer_instructions"
+              title="Hướng dẫn thanh toán (khối dưới tổng đơn — checkout)"
+              value="{{ old('checkout_transfer_instructions', system_setting('base.checkout_transfer_instructions', '')) }}"
+            />
+            <div class="help-text font-size-12 lh-base mb-3">Hiển thị dạng ô tóm tắt (cùng kiểu phí giao dự kiến). Để trống thì dùng nội dung mặc định trong ngôn ngữ shop.</div>
             @hook('admin.setting.general.after')
-          </div>
-
-          <div class="tab-pane fade" id="tab-store">
-            @hook('admin.setting.store.before')
-            <x-admin::form.row title="{{ __('admin/setting.default_address') }}">
-              <div class="d-lg-flex w-max-400">
-                <div class="w-50 me-3">
-                  <select class="form-select me-3" name="country_id" aria-label="Default select example">
-                    @foreach ($countries as $country)
-                      <option
-                        value="{{ $country->id }}"
-                        {{ $country->id == system_setting('base.country_id', '1') ? 'selected': '' }}>
-                        {{ $country->name }}
-                      </option>
-                    @endforeach
-                  </select>
-                  <div class="help-text font-size-12 lh-base">{{ __('admin/setting.default_country_set') }}</div>
-                </div>
-                <div class="w-50">
-                  <select class="form-select zones-select" name="zone_id" aria-label="Default select example"></select>
-                  <div class="help-text font-size-12 lh-base">{{ __('admin/setting.default_zone_set') }}</div>
-                </div>
-              </div>
-            </x-admin::form.row>
-
-            <x-admin-form-select title="{{ __('admin/setting.default_currency') }}" name="currency" :value="old('currency', system_setting('base.currency', 'USD'))" :options="$currencies->toArray()" key="code" label="name" />
-
-            <x-admin-form-select title="{{ __('admin/setting.default_language') }}" name="locale" :value="old('locale', system_setting('base.locale', 'zh_cn'))" :options="$languages" key="code" label="name" />
-
-            @php
-              $weight = array_map(function ($value) {
-                return ['code' => $value, 'name' => trans('product.' . $value)];
-              }, $weight_classes);
-            @endphp
-            <x-admin-form-select title="{{ __('admin/setting.weight_unit') }}"  name="weight" :options="$weight" :value="old('weight', system_setting('base.weight', 'kg'))" key="code" label="name" />
-
-            <x-admin-form-select title="{{ __('admin/setting.default_customer_group') }}" name="default_customer_group_id" :value="old('locale', system_setting('base.default_customer_group_id', ''))" :options="$customer_groups" key="id" label="name" />
-
-            <x-admin-form-input name="admin_name" title="{{ __('admin/setting.admin_name') }}" required value="{{ old('admin_name', system_setting('base.admin_name', 'admin')) }}">
-              <div class="help-text font-size-12 lh-base">{{ __('admin/setting.admin_name_info') }}</div>
-            </x-admin-form-input>
-
-            <x-admin-form-input name="product_per_page" title="{{ __('admin/setting.product_per_page') }}" required value="{{ old('product_per_page', system_setting('base.product_per_page', 20)) }}">
-            </x-admin-form-input>
-
-            <x-admin-form-input name="cdn_url" title="{{ __('admin/setting.cdn_url') }}" value="{{ old('cdn_url', system_setting('base.cdn_url', '')) }}">
-            </x-admin-form-input>
-
-            <x-admin::form.row title="{{ __('admin/setting.image_origin_size') }}">
-              <div class="d-lg-flex w-max-400">
-                <div class="w-50 me-3">
-                  <div class="input-group">
-                    <span class="input-group-text">{{ __('admin/builder.modules_width') }}</span>
-                    <input type="text" class="form-control" value="{{ old('product_image_origin_width', system_setting('base.product_image_origin_width', '800')) }}" name="product_image_origin_width">
-                  </div>
-                </div>
-                <div class="w-50">
-                  <div class="input-group">
-                    <span class="input-group-text">{{ __('admin/builder.modules_height') }}</span>
-                    <input type="text" class="form-control" value="{{ old('product_image_origin_height', system_setting('base.product_image_origin_height', '800')) }}" name="product_image_origin_height">
-                  </div>
-                </div>
-              </div>
-              <div class="help-text font-size-12 lh-base">{{ __('admin/setting.image_origin_size_text') }}</div>
-            </x-admin::form.row>
-
-            <x-admin-form-textarea name="head_code" title="{{ __('admin/setting.head_code') }}" value="{!! old('head_code', system_setting('base.head_code', '')) !!}">
-              <div class="help-text font-size-12 lh-base">{{ __('admin/setting.head_code_info') }}</div>
-            </x-admin-form-textarea>
-
-            @hook('admin.setting.store.after')
-
           </div>
 
           <div class="tab-pane fade" id="tab-image">
@@ -162,181 +124,15 @@
               <div class="help-text font-size-12 lh-base">{{ __('common.recommend_size') }} 388*73</div>
             </x-admin::form.row>
 
-            <x-admin::form.row title="favicon">
-              <div class="open-crop cursor-pointer bg-light wh-80 border d-flex justify-content-center align-items-center me-2 mb-2 position-relative" ratio="32/32">
+            <x-admin::form.row title="{{ __('admin/setting.favicon') }}">
+              <div class="open-crop cursor-pointer bg-light wh-80 border d-flex justify-content-center align-items-center me-2 mb-2 position-relative" ratio="1/1">
                 <img src="{{ image_resize(old('favicon', system_setting('base.favicon', ''))) }}" class="img-fluid">
               </div>
               <input type="hidden" value="{{ old('favicon', system_setting('base.favicon', '')) }}" name="favicon">
               <div class="help-text font-size-12 lh-base">{{ __('admin/setting.favicon_info') }}</div>
             </x-admin::form.row>
 
-            <x-admin::form.row :title="__('admin/setting.placeholder_image')">
-              <div class="open-crop cursor-pointer bg-light wh-80 border d-flex justify-content-center align-items-center me-2 mb-2 position-relative" ratio="500/500">
-                <img src="{{ image_resize(old('placeholder', system_setting('base.placeholder', ''))) }}" class="img-fluid">
-              </div>
-              <input type="hidden" value="{{ old('placeholder', system_setting('base.placeholder', '')) }}" name="placeholder">
-              <div class="help-text font-size-12 lh-base">{{ __('admin/setting.placeholder_image_info') }}</div>
-            </x-admin::form.row>
-
             @hook('admin.setting.image.after')
-          </div>
-
-          <div class="tab-pane fade" id="tab-express-company">
-            @hook('admin.setting.express.before')
-            <x-admin::form.row title="{{ __('order.express_company') }}">
-              <table class="table table-bordered w-max-600">
-                <thead>
-                  <th>{{ __('order.express_company') }}</th>
-                  <th>Code</th>
-                  @hook('admin.setting.express.table.thead.th')
-                  <th></th>
-                </thead>
-                <tbody>
-                  <tr v-for="item, index in express_company" :key="index">
-                    <td>
-                      <input required placeholder="{{ __('order.express_company') }}" type="text" :name="'express_company['+ index +'][name]'" v-model="item.name" class="form-control">
-                      <div class="invalid-feedback">{{ __('common.error_required', ['name' => __('order.express_company')]) }}</div>
-                    </td>
-                    <td>
-                      <input required placeholder="{{ __('admin/setting.express_code_help') }}" type="text" :name="'express_company['+ index +'][code]'" v-model="item.code" class="form-control">
-                      <div class="invalid-feedback">{{ __('common.error_required', ['name' => 'Code']) }}</div>
-                    </td>
-                    @hook('admin.setting.express.table.tbody.td')
-                    <td><i @click="express_company.splice(index, 1)" class="bi bi-x-circle fs-4 text-danger cursor-pointer"></i></td>
-                  </tr>
-                  <tr>
-                    <td colspan="2"><input v-if="!express_company.length" name="express_company" class="d-none"></td>
-                    <td><i class="bi bi-plus-circle cursor-pointer fs-4" @click="addCompany"></i></td>
-                  </tr>
-                </tbody>
-              </table>
-            </x-admin::form.row>
-            @hook('admin.setting.express.after')
-          </div>
-
-          <div class="tab-pane fade" id="tab-mail">
-
-            @hook('admin.setting.mail.before')
-
-            <x-admin-form-switch name="use_queue" title="{{ __('admin/setting.use_queue') }}" value="{{ old('use_queue', system_setting('base.use_queue', '0')) }}">
-              <div class="help-text font-size-12 lh-base">{{__('admin/setting.use_queue_text')}}https://docs.beikeshop.com/config/mail.html#%E9%98%9F%E5%88%97%E9%85%8D%E7%BD%AE</div>
-            </x-admin-form-switch>
-            <x-admin::form.row title="{{ __('admin/setting.mail_engine') }}">
-              <select name="mail_engine" v-model="mail_engine" class="form-select wp-200 me-3">
-                <option :value="item.code" v-for="item, index in source.mailEngines" :key="index">@{{ item.name }}</option>
-              </select>
-              <div v-if="mail_engine == 'log'" class="help-text font-size-12 lh-base">{{ __('admin/setting.mail_log') }}</div>
-            </x-admin::form.row>
-
-            <div v-if="mail_engine == 'smtp'">
-              <x-admin-form-input name="smtp[host]" required title="{{ __('admin/setting.smtp_host') }}" value="{{ old('host', system_setting('base.smtp.host', '')) }}">
-              </x-admin-form-input>
-              <x-admin-form-input name="smtp[username]" required title="{{ __('admin/setting.smtp_username') }}" value="{{ old('username', system_setting('base.smtp.username', '')) }}">
-              </x-admin-form-input>
-              <x-admin-form-input name="smtp[password]" type="password" required title="{{ __('admin/setting.smtp_password') }}" value="{{ old('password', system_setting('base.smtp.password', '')) }}">
-                <div class="help-text font-size-12 lh-base">{{ __('admin/setting.smtp_password_info') }}</div>
-              </x-admin-form-input>
-              <x-admin-form-input name="smtp[encryption]" required title="{{ __('admin/setting.smtp_encryption') }}" value="{{ old('encryption', system_setting('base.smtp.encryption', 'TLS')) }}">
-                <div class="help-text font-size-12 lh-base">{{ __('admin/setting.smtp_encryption_info') }}</div>
-              </x-admin-form-input>
-              <x-admin-form-input name="smtp[port]" required title="{{ __('admin/setting.smtp_port') }}" value="{{ old('port', system_setting('base.smtp.port', '465')) }}">
-              </x-admin-form-input>
-              <x-admin-form-input name="smtp[timeout]" required title="{{ __('admin/setting.smtp_timeout') }}" value="{{ old('timeout', system_setting('base.smtp.timeout', '5')) }}">
-              </x-admin-form-input>
-            </div>
-
-            <div v-if="mail_engine == 'sendmail'">
-              <x-admin-form-input name="sendmail[path]" :placeholder="222" required title="{{ __('admin/setting.sendmail_path') }}" value="{{ old('path', system_setting('base.sendmail.path', '')) }}">
-                <div class="help-text font-size-12 lh-base">系统 sendmail 执行路径, 一般为 /usr/sbin/sendmail -bs</div>
-              </x-admin-form-input>
-            </div>
-
-            <div v-if="mail_engine == 'mailgun'">
-              <x-admin-form-input name="mailgun[domain]" required title="{{ __('admin/setting.mailgun_domain') }}" value="{{ old('domain', system_setting('base.mailgun.domain', '')) }}">
-              </x-admin-form-input>
-              <x-admin-form-input name="mailgun[secret]" required title="{{ __('admin/setting.mailgun_secret') }}" value="{{ old('secret', system_setting('base.mailgun.secret', '')) }}">
-              </x-admin-form-input>
-              <x-admin-form-input name="mailgun[endpoint]" required title="{{ __('admin/setting.mailgun_endpoint') }}" value="{{ old('endpoint', system_setting('base.mailgun.endpoint', '')) }}">
-              </x-admin-form-input>
-            </div>
-
-            <div v-if="mail_engine != ''">
-              <x-admin::form.row :title="__('admin/setting.email_send_admin')">
-                <div class="input-group wp-400">
-                  <input name="mail_alert[]" type="hidden" value="">
-                  <div class="form-check mt-2 me-3">
-                    <input class="form-check-input" type="checkbox" id="check-input-register" name="mail_alert[]" value="register" {{ in_array('register', old('mail_alert', system_setting('base.mail_alert', []))) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="check-input-register">{{ __('admin/setting.email_type_register') }}</label>
-                  </div>
-                  <div class="form-check mt-2 me-3">
-                    <input class="form-check-input" type="checkbox" id="check-input-order" name="mail_alert[]" value="order" {{ in_array('order', old('mail_alert', system_setting('base.mail_alert', []))) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="check-input-order">{{ __('admin/setting.email_type_order') }}</label>
-                  </div>
-                  <div class="form-check mt-2 me-3">
-                    <input class="form-check-input" type="checkbox" id="check-input-return" name="mail_alert[]" value="return" {{ in_array('return', old('mail_alert', system_setting('base.mail_alert', []))) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="check-input-return">{{ __('admin/setting.email_type_return') }}</label>
-                  </div>
-                </div>
-              </x-admin::form.row>
-              <x-admin::form.row :title="__('admin/setting.email_send_customer')">
-                <input name="mail_customer[]" type="hidden" value="">
-                <div class="input-group wp-400">
-                  <div class="form-check mt-2 me-3">
-                    <input class="form-check-input" type="checkbox" id="check-input-customer-register" name="mail_customer[]" value="register" {{ in_array('register', old('mail_customer', system_setting('base.mail_customer', []))) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="check-input-customer-register">{{ __('admin/setting.email_type_register') }}</label>
-                  </div>
-                  <div class="form-check mt-2 me-3">
-                    <input class="form-check-input" type="checkbox" id="check-input-customer-order" name="mail_customer[]" value="order" {{ in_array('order', old('mail_customer', system_setting('base.mail_customer', []))) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="check-input-customer-order">{{ __('admin/setting.email_type_order') }}</label>
-                  </div>
-                  <div class="form-check mt-2 me-3">
-                    <input class="form-check-input" type="checkbox" id="check-input-customer-return" name="mail_customer[]" value="return" {{ in_array('return', old('mail_customer', system_setting('base.mail_customer', []))) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="check-input-customer-return">{{ __('admin/setting.email_type_return') }}</label>
-                  </div>
-                </div>
-                <div class="help-text lh-base smtp-qq-hint d-none">{{ __('admin/setting.smtp_qq_hint') }}</div>
-              </x-admin::form.row>
-            </div>
-
-            @hook('admin.setting.mail.after')
-          </div>
-
-          <div class="tab-pane fade" id="tab-checkout">
-            <x-admin-form-switch name="show_price_after_login" title="{{ __('admin/setting.show_price_after_login') }}" value="{{ old('show_price_after_login', system_setting('base.show_price_after_login', '0')) }}">
-              <div class="help-text font-size-12 lh-base show-price-error-text">{{ __('admin/setting.show_price_after_login_tips') }}</div>
-            </x-admin-form-switch>
-
-            <x-admin-form-switch name="guest_checkout" title="{{ __('admin/setting.guest_checkout') }}" value="{{ old('guest_checkout', system_setting('base.guest_checkout', '1')) }}" />
-
-            <x-admin-form-switch name="customer_approved" title="{{ __('admin/setting.customer_approved') }}" value="{{ old('customer_approved', system_setting('base.customer_approved', '0')) }}">
-            </x-admin-form-switch>
-
-            <x-admin-form-switch name="tax" title="{{ __('admin/setting.enable_tax') }}" value="{{ old('tax', system_setting('base.tax', '0')) }}">
-              <div class="help-text font-size-12 lh-base">{{ __('admin/setting.enable_tax_info') }}</div>
-            </x-admin-form-switch>
-
-            <x-admin-form-select title="{{ __('admin/setting.tax_address') }}" name="tax_address" :value="old('tax_address', system_setting('base.tax_address', 'shipping'))" :options="$tax_address">
-            </x-admin-form-select>
-
-            <x-admin-form-input name="rate_api_key" title="{{ __('admin/setting.rate_api_key') }}" value="{{ old('rate_api_key', system_setting('base.rate_api_key', '')) }}">
-              <div class="help-text font-size-12 lh-base">
-                <a class="text-secondary" href="https://www.exchangerate-api.com/" target="_blank">www.exchangerate-api.com</a>
-              </div>
-            </x-admin-form-input>
-
-            <x-admin::form.row :title="__('admin/setting.order_auto_cancel')">
-              <div class="input-group wp-400">
-                <input type="number" value="{{ old('order_auto_cancel', system_setting('base.order_auto_cancel', '')) }}" name="order_auto_cancel" class="form-control" placeholder="{{ __('admin/setting.order_auto_cancel') }}">
-                <span class="input-group-text">{{ __('common.text_hour') }}</span>
-              </div>
-            </x-admin::form.row>
-
-            <x-admin::form.row :title="__('admin/setting.order_auto_complete')">
-              <div class="input-group wp-400">
-                <input type="number" value="{{ old('order_auto_complete', system_setting('base.order_auto_complete', '')) }}" name="order_auto_complete" class="form-control" placeholder="{{ __('admin/setting.order_auto_complete') }}">
-                <span class="input-group-text">{{ __('common.text_hour') }}</span>
-              </div>
-            </x-admin::form.row>
           </div>
 
           @hook('admin.setting.after')

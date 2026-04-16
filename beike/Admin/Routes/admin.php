@@ -163,6 +163,8 @@ Route::prefix($adminName)
 
                 // 订单
                 Route::middleware('can:orders_restore')->put('orders/restore/{id}', [Controllers\OrderController::class, 'restore']);
+                Route::middleware('can:orders_restore')->put('orders/restore_batch', [Controllers\OrderController::class, 'restoreByIds'])->name('orders.restore_batch');
+                Route::middleware('can:orders_delete')->delete('orders/delete', [Controllers\OrderController::class, 'destroyByIds'])->name('orders.batch_delete');
                 Route::middleware('can:orders_trashed')->get('orders/trashed', [Controllers\OrderController::class, 'trashed'])->name('orders.trashed');
                 Route::middleware('can:orders_index')->get('orders', [Controllers\OrderController::class, 'index'])->name('orders.index');
                 Route::middleware('can:orders_export')->get('orders/export', [Controllers\OrderController::class, 'export'])->name('orders.export');

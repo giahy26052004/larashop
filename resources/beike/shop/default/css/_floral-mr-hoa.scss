@@ -1,0 +1,546 @@
+/**
+ * MrHoa — floral shop visual layer (pastel, serif headings, soft cards)
+ * Fonts loaded in layout/master.blade.php
+ */
+
+:root {
+  --mr-floral-pink: #f8c1cc;
+  --mr-floral-rose: #e8b4bc;
+  --mr-floral-green: #2a5a4a;
+  --mr-floral-green-soft: #3d7a66;
+  --mr-floral-peach: #f5d9c8;
+  --mr-floral-lavender: #d8b4e0;
+  --mr-floral-bg: #faf7f2;
+  --mr-floral-bg-alt: #f8faf7;
+  --mr-floral-text: #2c3e36;
+  --mr-floral-muted: #5c6d63;
+  --mr-font-heading: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --mr-font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --mr-radius-lg: 1.25rem;
+  --mr-shadow-soft: 0 12px 40px rgba(42, 90, 74, 0.08);
+}
+
+body.theme-mrhoa {
+  font-family: var(--mr-font-body);
+  color: var(--mr-floral-text);
+  background-color: var(--mr-floral-bg);
+  background-image: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(248, 193, 204, 0.35), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 100% 100%, rgba(216, 180, 224, 0.12), transparent 45%);
+}
+
+body.theme-mrhoa h1,
+body.theme-mrhoa h2,
+body.theme-mrhoa h3,
+body.theme-mrhoa h4,
+body.theme-mrhoa h5,
+body.theme-mrhoa .page-title,
+body.theme-mrhoa .product-name,
+body.theme-mrhoa .footer-content .intro-title,
+body.theme-mrhoa .mr-hoa-section-title {
+  font-family: var(--mr-font-heading);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--mr-floral-green);
+}
+
+/* ——— Header ——— */
+body.theme-mrhoa .header-content {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(250, 247, 242, 0.92) 100%);
+  border-bottom: 1px solid rgba(42, 90, 74, 0.08);
+  box-shadow: 0 4px 24px rgba(42, 90, 74, 0.06);
+}
+
+body.theme-mrhoa .logo img {
+  max-height: 52px;
+}
+
+body.theme-mrhoa .mr-hoa-brand-tagline {
+  font-size: 0.78rem;
+  color: var(--mr-floral-muted);
+  letter-spacing: 0.04em;
+  margin-top: 0.15rem;
+  font-family: var(--mr-font-body);
+}
+
+body.theme-mrhoa .menu-wrap .nav a,
+body.theme-mrhoa .mobile-menu-wrap a {
+  transition: color 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 0.25rem;
+}
+
+body.theme-mrhoa .menu-wrap .nav a:hover {
+  color: var(--mr-floral-rose) !important;
+  box-shadow: inset 0 -2px 0 var(--mr-floral-pink);
+}
+
+body.theme-mrhoa .navbar-nav .nav-link img {
+  opacity: 0.85;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+body.theme-mrhoa .navbar-nav .nav-link:hover img {
+  transform: scale(1.06);
+  filter: hue-rotate(-8deg) saturate(1.1);
+}
+
+body.theme-mrhoa .header-mobile {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(42, 90, 74, 0.08);
+}
+
+body.theme-mrhoa .offcanvas-start {
+  background: linear-gradient(165deg, #fffefb 0%, var(--mr-floral-bg-alt) 100%);
+}
+
+/* ——— Footer ——— */
+body.theme-mrhoa footer {
+  position: relative;
+  background: linear-gradient(180deg, var(--mr-floral-bg-alt) 0%, #f0ebe4 100%);
+}
+
+body.theme-mrhoa footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath fill='%232A5A4A' fill-opacity='0.04' d='M40 10c8 12 22 18 22 30s-10 22-22 22-22-10-22-22 14-18 22-30z'/%3E%3C/svg%3E");
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+body.theme-mrhoa .footer-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ——— Home extras ——— */
+.mr-hoa-home-extras {
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+}
+
+.mr-hoa-section-title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.mr-hoa-occasions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .mr-hoa-occasions {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.mr-hoa-occasion-card {
+  display: block;
+  border-radius: var(--mr-radius-lg);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: var(--mr-shadow-soft);
+  text-decoration: none;
+  color: var(--mr-floral-text);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid rgba(42, 90, 74, 0.06);
+}
+
+.mr-hoa-occasion-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 16px 48px rgba(232, 180, 188, 0.35);
+  color: var(--mr-floral-green);
+}
+
+.mr-hoa-occasion-card .occasion-visual {
+  aspect-ratio: 1;
+  background: linear-gradient(145deg, var(--mr-floral-pink), var(--mr-floral-peach));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.mr-hoa-occasion-card .occasion-label {
+  padding: 0.65rem 0.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.mr-hoa-why {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+.mr-hoa-why-item {
+  background: #fff;
+  border-radius: var(--mr-radius-lg);
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  border: 1px solid rgba(42, 90, 74, 0.08);
+  box-shadow: var(--mr-shadow-soft);
+}
+
+.mr-hoa-why-item .icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.mr-hoa-newsletter {
+  border-radius: var(--mr-radius-lg);
+  padding: 2rem 1.5rem;
+  background: linear-gradient(120deg, rgba(248, 193, 204, 0.35), rgba(216, 180, 224, 0.25));
+  border: 1px solid rgba(42, 90, 74, 0.1);
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.mr-hoa-newsletter .form-control {
+  border-radius: 2rem;
+  border: 1px solid rgba(42, 90, 74, 0.15);
+}
+
+.mr-hoa-newsletter .btn-mr-floral {
+  border-radius: 2rem;
+  padding: 0.5rem 1.5rem;
+}
+
+/* ——— Product cards (listing) ——— */
+body.theme-mrhoa .product-wrap {
+  background: #fff;
+  border-radius: var(--mr-radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(42, 90, 74, 0.07);
+  box-shadow: var(--mr-shadow-soft);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+body.theme-mrhoa .product-wrap:hover {
+  box-shadow: 0 20px 50px rgba(232, 180, 188, 0.25);
+  transform: translateY(-3px);
+}
+
+/* Lưới: ảnh luôn phủ kín khung 4:5 (flex center làm ảnh “nhỏ” giữa nền) */
+body.theme-mrhoa .product-wrap:not(.list) .image-old {
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--mr-floral-bg);
+}
+
+body.theme-mrhoa .product-wrap:not(.list) .image-old img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.45s ease;
+}
+
+body.theme-mrhoa .product-wrap:not(.list):hover .image-old img {
+  transform: scale(1.06);
+}
+
+/* Chế độ danh sách: giữ tỉ lệ ảnh tự nhiên, không cắt */
+body.theme-mrhoa .product-wrap.list .image-old {
+  aspect-ratio: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.theme-mrhoa .product-wrap.list .image-old img {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: auto;
+  max-height: 220px;
+  object-fit: contain;
+}
+
+body.theme-mrhoa .product-wrap:not(.list) .image {
+  border-radius: var(--mr-radius-lg) var(--mr-radius-lg) 0 0;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+body.theme-mrhoa .product-wrap .button-wrap {
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.95));
+}
+
+body.theme-mrhoa .product-wrap .btn-dark,
+body.theme-mrhoa .product-wrap .btn-outline-dark {
+  background: linear-gradient(135deg, var(--mr-floral-rose), #f0a8b5) !important;
+  border: none !important;
+  color: #fff !important;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+}
+
+body.theme-mrhoa .product-wrap .btn-dark:hover {
+  filter: brightness(1.05);
+}
+
+body.theme-mrhoa .floral-badge-sale {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: linear-gradient(135deg, var(--mr-floral-green), var(--mr-floral-green-soft));
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 2rem;
+  letter-spacing: 0.03em;
+}
+
+body.theme-mrhoa .product-wrap .image {
+  position: relative;
+}
+
+body.theme-mrhoa .product-bottom-info {
+  padding: 0.75rem 1rem 1rem;
+}
+
+body.theme-mrhoa .product-name {
+  font-size: 1.05rem;
+}
+
+body.theme-mrhoa .price-new {
+  color: var(--mr-floral-green) !important;
+  font-weight: 600 !important;
+}
+
+body.theme-mrhoa .product-price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  line-height: 1.3;
+}
+
+body.theme-mrhoa .product-price .price-old {
+  font-size: 0.88em;
+  opacity: 0.72;
+  text-decoration: line-through;
+}
+
+/* ——— Category / filter sidebar ——— */
+body.theme-mrhoa .left-column .module-category-wrap h4 {
+  font-family: var(--mr-font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--mr-floral-green);
+  padding-left: 0.65rem;
+  border-left: 3px solid var(--mr-floral-rose);
+}
+
+body.theme-mrhoa .left-column .module-category-wrap .sidebar-widget a {
+  font-size: 0.88rem;
+  color: var(--mr-floral-muted);
+}
+
+body.theme-mrhoa .left-column .module-category-wrap .sidebar-widget a:hover {
+  color: var(--mr-floral-green);
+}
+
+body.theme-mrhoa .mr-hoa-filter-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+body.theme-mrhoa .mr-hoa-filter-box .mr-hoa-filter-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(42, 90, 74, 0.09);
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(42, 90, 74, 0.05);
+  margin-bottom: 0;
+  padding: 0.75rem 0.9rem 0.85rem;
+}
+
+body.theme-mrhoa .mr-hoa-filter-box .mr-hoa-filter-title,
+body.theme-mrhoa .mr-hoa-filter-box .card-header h4 {
+  font-family: var(--mr-font-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--mr-floral-green);
+  margin-bottom: 0.5rem;
+  padding-left: 0.65rem;
+  border-left: 3px solid var(--mr-floral-rose);
+  line-height: 1.35;
+}
+
+body.theme-mrhoa .mr-hoa-filter-box .mr-hoa-filter-check-label {
+  font-family: var(--mr-font-body);
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: var(--mr-floral-text);
+  line-height: 1.45;
+  padding-top: 0.05rem;
+}
+
+body.theme-mrhoa .mr-hoa-filter-box .mr-hoa-filter-attr-list .list-group-item {
+  background: transparent;
+}
+
+body.theme-mrhoa .mr-hoa-filter-box .form-check-input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.2rem;
+  border: 2px solid rgba(42, 90, 74, 0.22);
+  border-radius: 0.3rem;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.theme-mrhoa .mr-hoa-filter-box .form-check-input:hover {
+  border-color: rgba(61, 122, 102, 0.45);
+}
+
+body.theme-mrhoa .mr-hoa-filter-box .form-check-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(232, 180, 188, 0.35);
+}
+
+body.theme-mrhoa .mr-hoa-filter-box .form-check-input:checked {
+  background-color: var(--mr-floral-green);
+  border-color: var(--mr-floral-green);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23fff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.2l2.8 2.6 6.2-6.2'/%3E%3C/svg%3E");
+  background-size: 0.7rem;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+body.theme-mrhoa .mr-hoa-filter-box .price-range {
+  font-size: 0.82rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+body.theme-mrhoa .mr-hoa-filter-box .price-range .form-control {
+  border-radius: 0.45rem;
+  border: 1px solid rgba(42, 90, 74, 0.12);
+  font-size: 0.85rem;
+  padding: 0.25rem 0.45rem;
+  max-width: 6.5rem;
+}
+
+body.theme-mrhoa .mr-hoa-filter-box #price-slider {
+  margin-bottom: 0.65rem;
+}
+
+body.theme-mrhoa .ui-slider .ui-slider-range {
+  background: linear-gradient(90deg, var(--mr-floral-pink), var(--mr-floral-green-soft)) !important;
+}
+
+body.theme-mrhoa .ui-slider .ui-slider-handle {
+  border-color: var(--mr-floral-rose) !important;
+  background: #fff !important;
+  border-radius: 50%;
+  cursor: grab;
+}
+
+body.theme-mrhoa .ui-slider .ui-slider-handle:active {
+  cursor: grabbing;
+}
+
+/* ——— Product detail ——— */
+body.theme-mrhoa .add-cart-btns .btn-outline-dark,
+body.theme-mrhoa .add-cart-btns .btn-dark,
+body.theme-mrhoa .product-btns .add-cart {
+  border-radius: 2rem !important;
+  padding: 0.65rem 1.5rem !important;
+}
+
+body.theme-mrhoa .product-btns .add-cart {
+  background: linear-gradient(135deg, var(--mr-floral-rose), #e090a0) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 8px 24px rgba(232, 180, 188, 0.45);
+}
+
+body.theme-mrhoa .product-btns .btn-buy-now {
+  background: var(--mr-floral-green) !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+body.theme-mrhoa .mr-hoa-gift-note {
+  background: rgba(248, 193, 204, 0.15);
+  border: 1px dashed rgba(42, 90, 74, 0.2);
+  border-radius: var(--mr-radius-lg);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+body.theme-mrhoa .mr-hoa-gift-note textarea {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(42, 90, 74, 0.12);
+}
+
+body.theme-mrhoa .mr-hoa-trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 1rem 0 0;
+  font-size: 0.9rem;
+  color: var(--mr-floral-muted);
+}
+
+body.theme-mrhoa .mr-hoa-trust-strip span::before {
+  content: '✓ ';
+  color: var(--mr-floral-green-soft);
+  font-weight: bold;
+}
+
+/* ——— Buttons global tweak ——— */
+body.theme-mrhoa .btn-primary {
+  background: linear-gradient(135deg, var(--mr-floral-green), var(--mr-floral-green-soft)) !important;
+  border: none !important;
+}
+
+body.theme-mrhoa .to-checkout.btn-dark {
+  background: linear-gradient(135deg, var(--mr-floral-green), #234a3d) !important;
+  border: none !important;
+  border-radius: 2rem !important;
+}
+
+/* ——— Breadcrumb ——— */
+body.theme-mrhoa .breadcrumb {
+  background: transparent;
+}
+
+/* ——— Giỏ hàng: tổng cộng + phí giao dự kiến ——— */
+body.theme-mrhoa .mr-hoa-cart-totals .mr-hoa-cart-shipping-block {
+  background: rgba(248, 193, 204, 0.12);
+  border-radius: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+body.theme-mrhoa .total-wrap .mr-hoa-checkout-shipping-hint {
+  background: rgba(248, 193, 204, 0.1);
+  border: 1px solid rgba(35, 74, 61, 0.08);
+}
+
+body.theme-mrhoa .total-wrap .mr-hoa-checkout-transfer-block {
+  background: rgba(35, 74, 61, 0.06);
+  border: 1px solid rgba(35, 74, 61, 0.12);
+  border-radius: 0.75rem;
+}

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\MrhoaFooterService;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,5 +33,9 @@ class AppServiceProvider extends ServiceProvider
         if (!defined('CURL_SSLVERSION_TLSv1_2')) {
             define('CURL_SSLVERSION_TLSv1_2', 6);
         }
+
+        add_hook_filter('footer.content', function (array $footerSetting): array {
+            return MrhoaFooterService::filterFooterContent($footerSetting);
+        });
     }
 }

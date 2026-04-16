@@ -10,16 +10,16 @@
  */
 
 return [
-    'customer_new'  => 'Customer New',
-    'customer_view' => 'Customer View',
-    'day_before'    => 'Last day',
-    'latest_month'  => 'Latest Month',
-    'latest_week'   => 'Latest Week',
-    'latest_year'   => 'Latest Year',
-    'order_amount'  => 'Order Amount',
-    'order_report'  => 'Order Report',
-    'order_total'   => 'Order Total',
-    'product_total' => 'New product',
-    'today'         => 'today',
-    'yesterday'     => 'Yesterday',
+    'customer_new'  => 'Khách mới',
+    'customer_view' => 'Lượt xem',
+    'day_before'    => 'So với hôm trước',
+    'latest_month'  => 'Tháng gần nhất',
+    'latest_week'   => 'Tuần gần nhất',
+    'latest_year'   => 'Năm gần nhất',
+    'order_amount'  => 'Doanh thu đơn',
+    'order_report'  => 'Báo cáo đơn hàng',
+    'order_total'   => 'Số đơn',
+    'product_total' => 'Sản phẩm mới',
+    'today'         => 'Hôm nay',
+    'yesterday'     => 'Hôm qua',
 ];

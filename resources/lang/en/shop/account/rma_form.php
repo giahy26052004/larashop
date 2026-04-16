@@ -10,10 +10,10 @@
  */
 
 return [
-    'index'           => 'Submit RMA information',
-    'service_type'    => 'Service Type',
-    'return_quantity' => 'Return Quantity',
-    'unpacked'        => 'Unpacked',
-    'return_reason'   => 'Reason For Return',
-    'remark'          => 'Remark',
+    'index'           => 'Gửi thông tin đổi trả',
+    'service_type'    => 'Loại dịch vụ',
+    'return_quantity' => 'Số lượng trả',
+    'unpacked'        => 'Đã mở hộp',
+    'return_reason'   => 'Lý do trả hàng',
+    'remark'          => 'Ghi chú',
 ];

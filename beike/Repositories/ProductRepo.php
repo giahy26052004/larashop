@@ -55,7 +55,13 @@ class ProductRepo
      */
     public static function getProductsByCategory($categoryId, $filterData)
     {
-        $builder = static::getBuilder(array_merge(['category_id' => $categoryId, 'active' => 1], $filterData));
+        $filters = array_merge(['category_id' => $categoryId, 'active' => 1], $filterData);
+        $attr    = trim((string) ($filterData['attr'] ?? ''));
+        if ($attr !== '' && config('mrhoa.category_attr_products_global', true)) {
+            unset($filters['category_id']);
+        }
+
+        $builder = static::getBuilder($filters);
 
         return $builder->with('inCurrentWishlist')
             ->paginate($filterData['per_page'] ?? perPage())
@@ -265,7 +271,101 @@ class ProductRepo
         return $attributes;
     }
 
+    /**
+     * Thuộc tính dùng làm tag lọc trên cửa hàng: thuộc nhóm "Tag bộ lọc" (hoặc "Tag bo loc").
+     * Thêm/sửa trong Admin > Sản phẩm > Tag lọc — không cần cấu hình multi_filter thủ công.
+     */
+    public static function getShopFilterAttributeIds(): array
+    {
+        $locale = locale();
+
+        $ids = Attribute::query()
+            ->whereHas('attributeGroup', function ($q) use ($locale) {
+                $q->whereHas('descriptions', function ($q2) use ($locale) {
+                    $q2->where('locale', $locale)
+                        ->whereIn('name', ['Tag bộ lọc', 'Tag bo loc']);
+                });
+            })
+            ->orderBy('sort_order')
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->toArray();
+
+        if ($ids !== []) {
+            return $ids;
+        }
+
+        return system_setting('base.multi_filter', [])['attribute'] ?? [];
+    }
+
     public static function getFilterAttribute($data): array
+    {
+        if (config('mrhoa.category_filter_full_tag_values', true)) {
+            return self::getFilterAttributeFullCatalog($data);
+        }
+
+        return self::getFilterAttributeFromCategoryProducts($data);
+    }
+
+    /**
+     * Lấy đủ mọi giá trị thuộc tính (nhóm Tag bộ lọc) đã khai báo trong admin — không giới hạn theo SP đang có trong danh mục.
+     */
+    private static function getFilterAttributeFullCatalog(array $data): array
+    {
+        $attributeIds = self::getShopFilterAttributeIds();
+        if ($attributeIds === []) {
+            return [];
+        }
+
+        $parsed      = isset($data['attr']) ? self::parseFilterParamsAttr($data['attr']) : [];
+        $selectedMap = array_column($parsed, 'value', 'attr');
+
+        $rows = Attribute::query()
+            ->whereIn('id', $attributeIds)
+            ->with([
+                'description',
+                'values' => function ($q) {
+                    // attribute_values has no sort_order column (only attributes does)
+                    $q->orderBy('id');
+                },
+                'values.description',
+            ])
+            ->orderBy('sort_order')
+            ->get();
+
+        $results = [];
+        foreach ($rows as $attr) {
+            $attrName = $attr->description->name ?? '';
+            $sel      = $selectedMap[$attr->id] ?? $selectedMap[(string) $attr->id] ?? [];
+            $sel      = is_array($sel) ? array_map('intval', $sel) : [];
+
+            $values = [];
+            foreach ($attr->values as $v) {
+                $vName = $v->description->name ?? '';
+                if ($vName === '') {
+                    continue;
+                }
+                $values[] = [
+                    'id'       => $v->id,
+                    'name'     => $vName,
+                    'selected' => in_array((int) $v->id, $sel, true),
+                ];
+            }
+
+            $results[] = [
+                'id'     => $attr->id,
+                'name'   => $attrName,
+                'values' => $values,
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * Chỉ hiện tag khi có ít nhất một sản phẩm trong danh mục (sau lọc) mang giá trị đó — hành vi gốc BeikeShop.
+     */
+    private static function getFilterAttributeFromCategoryProducts(array $data): array
     {
         $builder = static::getBuilder(array_diff_key($data, ['attr' => '', 'price' => '']))
             ->select(['pa.attribute_id', 'pa.attribute_value_id'])
@@ -275,7 +375,8 @@ class ProductRepo
             ->distinct()
             ->reorder('pa.attribute_id');
 
-        if ($attributesIds = system_setting('base.multi_filter', [])['attribute'] ?? []) {
+        $attributesIds = self::getShopFilterAttributeIds();
+        if ($attributesIds !== []) {
             $builder->whereIn('pa.attribute_id', $attributesIds);
         }
 

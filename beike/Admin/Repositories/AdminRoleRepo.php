@@ -67,7 +67,7 @@ class AdminRoleRepo
             foreach ($groupedPermissions['permissions'] as $groupedPermission) {
                 if ($groupedPermission['selected']) {
                     $code = $groupedPermission['code'];
-                    Permission::findOrCreate($code);
+                    Permission::findOrCreate($code, 'web_admin');
                     $items[] = $code;
                 }
             }

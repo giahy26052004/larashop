@@ -1,37 +1,49 @@
 @extends('admin::layouts.master')
 
-@section('title', __('admin/common.order'))
+@section('title', 'Đơn hàng')
 
 @section('page-bottom-btns')
 @hook('order.detail.title.right')
 @endsection
 
 @section('page-title-right')
-  <a href="{{ admin_route('orders.shipping.get') }}?order_id={{ $order->id }}"target="_blank" class="btn btn-outline-secondary"><i class="bi bi-printer-fill"></i> {{ __('admin/order.btn_print') }}</a>
+  <a href="{{ admin_route('orders.shipping.get') }}?order_id={{ $order->id }}" target="_blank" class="btn btn-outline-secondary"><i class="bi bi-printer-fill"></i> In đơn hàng</a>
 @endsection
 
 @section('content')
+  @php
+    $statusClassMap = [
+      'unpaid' => 'bg-warning text-dark',
+      'paid' => 'bg-success',
+      'shipped' => 'bg-info text-dark',
+      'completed' => 'bg-primary',
+      'cancelled' => 'bg-danger',
+    ];
+    $orderComment = (string) ($order->comment ?? '');
+    $deliveryTime = null;
+    if (preg_match('/^Giờ giao mong muốn:\s*(.+)$/mu', $orderComment, $m)) {
+      $deliveryTime = trim($m[1]);
+      $orderComment = trim(preg_replace('/^Giờ giao mong muốn:\s*.+$/mu', '', $orderComment));
+    }
+  @endphp
+
   @hook('admin.order.form.content.before')
 
   @hookwrapper('admin.order.form.base')
   <div class="card mb-4">
-    <div class="card-header"><h6 class="card-title">{{ __('admin/common.order') }}</h6></div>
+    <div class="card-header"><h6 class="card-title">Thông tin đơn hàng</h6></div>
     <div class="card-body order-top-info">
       <div class="row">
         <div class="col-lg-4 col-12">
           <table class="table table-borderless">
             <tbody>
               <tr>
-                <td>{{ __('order.number') }}：</td>
+                <td>Mã đơn hàng：</td>
                 <td>{{ $order->number }}</td>
               </tr>
               <tr>
-                <td>{{ __('order.payment_method') }}：</td>
+                <td>Phương thức thanh toán：</td>
                 <td>{{ $order->payment_method_name }}</td>
-              </tr>
-              <tr>
-                <td>{{ __('admin/plugin.shipping') }}：</td>
-                <td>{{ $order->shipping_method_name }}</td>
               </tr>
             </tbody>
           </table>
@@ -40,17 +52,25 @@
           <table class="table table-borderless">
             <tbody>
               <tr>
-                <td>{{ __('order.total') }}：</td>
+                <td>Tổng：</td>
                 <td>{{ currency_format($order->total, $order->currency_code, $order->currency_value) }}</td>
               </tr>
               <tr>
-                <td>{{ __('order.customer_name') }}：</td>
+                <td>Tên khách：</td>
                 <td>{{ $order->customer_name }}</td>
               </tr>
-              <tr>
-                <td>{{ __('common.email') }}：</td>
-                <td>{{ $order->email }}</td>
-              </tr>
+              @if ($order->email)
+                <tr>
+                  <td>Email：</td>
+                  <td>{{ $order->email }}</td>
+                </tr>
+              @endif
+              @if ($deliveryTime)
+                <tr>
+                  <td>Giờ nhận hoa：</td>
+                  <td>{{ mrhoa_format_delivery_wish($deliveryTime) }}</td>
+                </tr>
+              @endif
             </tbody>
           </table>
         </div>
@@ -58,11 +78,11 @@
           <table class="table table-borderless">
             <tbody>
               <tr>
-                <td>{{ __('order.created_at') }}：</td>
+                <td>Ngày tạo：</td>
                 <td>{{ $order->created_at }}</td>
               </tr>
               <tr>
-                <td>{{ __('order.updated_at') }}：</td>
+                <td>Ngày cập nhật：</td>
                 <td>{{ $order->updated_at }}</td>
               </tr>
               @hook('admin.order.form.base.updated_at.after')
@@ -76,15 +96,15 @@
 
   @hookwrapper('admin.order.form.address')
   <div class="card mb-4">
-    <div class="card-header"><h6 class="card-title">{{ __('order.address_info') }}</h6></div>
+    <div class="card-header"><h6 class="card-title">Thông tin địa chỉ</h6></div>
     <div class="card-body">
       <table class="table table-no-mb">
         <thead class="">
           <tr>
             @if ($order->shipping_country)
-            <th>{{ __('order.shipping_address') }}</th>
+            <th>Địa chỉ giao hàng</th>
             @endif
-            <th>{{ __('order.payment_address') }}</th>
+            <th>Địa chỉ thanh toán</th>
           </tr>
         </thead>
         <tbody>
@@ -92,38 +112,42 @@
             @if ($order->shipping_country)
             <td>
               <div>
-                {{ __('address.name') }}：{{ $order->shipping_customer_name }}
+                Tên：{{ $order->shipping_customer_name }}
                 @if ($order->shipping_telephone)
                 ({{ $order->shipping_telephone }})
                 @endif
               </div>
               <div>
-                {{ __('address.address') }}：
+                Địa chỉ：
                 {{ $order->shipping_address_1 }}
                 {{ $order->shipping_address_2 }}
                 {{ $order->shipping_city }}
                 {{ $order->shipping_zone }}
                 {{ $order->shipping_country }}
               </div>
-              <div>{{ __('address.post_code') }}：{{ $order->shipping_zipcode }}</div>
+              @if ($order->shipping_zipcode)
+                <div>Mã bưu chính：{{ $order->shipping_zipcode }}</div>
+              @endif
             </td>
             @endif
             <td>
               <div>
-                {{ __('address.name') }}：{{ $order->payment_customer_name }}
+                Tên：{{ $order->payment_customer_name }}
                 @if ($order->payment_telephone)
                 ({{ $order->payment_telephone }})
                 @endif
               </div>
               <div>
-                {{ __('address.address') }}：
+                Địa chỉ：
                 {{ $order->payment_address_1 }}
                 {{ $order->payment_address_2 }}
                 {{ $order->payment_city }}
                 {{ $order->payment_zone }}
                 {{ $order->payment_country }}
               </div>
-              <div>{{ __('address.post_code') }}：{{ $order->payment_zipcode }}</div>
+              @if ($order->payment_zipcode)
+                <div>Mã bưu chính：{{ $order->payment_zipcode }}</div>
+              @endif
             </td>
           </tr>
         </tbody>
@@ -139,15 +163,17 @@
   @can('orders_update_status')
   @hookwrapper('admin.order.form.status')
   <div class="card mb-4">
-    <div class="card-header"><h6 class="card-title">{{ __('order.order_status') }}</h6></div>
+    <div class="card-header"><h6 class="card-title">Trạng thái đơn hàng</h6></div>
     <div class="card-body" id="app">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="{{ __('order.current_status') }}">
-          {{ $order->status_format }}
+        <el-form-item label="Trạng thái hiện tại">
+          <span class="badge {{ $statusClassMap[$order->status] ?? 'bg-secondary' }}">
+            {{ $order->status_format }}
+          </span>
         </el-form-item>
         @if (count($statuses))
-          <el-form-item label="{{ __('order.change_to_status') }}" prop="status">
-            <el-select class="wp-200" size="small" v-model="form.status" placeholder="{{ __('common.please_choose') }}">
+          <el-form-item label="Chuyển sang trạng thái" prop="status">
+            <el-select class="wp-200" size="small" v-model="form.status" placeholder="Vui lòng chọn">
               <el-option
                 v-for="item in statuses"
                 :key="item.status"
@@ -156,8 +182,8 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="{{ __('order.express_company') }}" v-if="form.status == 'shipped'" prop="express_code">
-            <el-select class="wp-200" size="small" v-model="form.express_code" placeholder="{{ __('common.please_choose') }}">
+          <el-form-item label="Đơn vị vận chuyển" v-if="form.status == 'shipped'" prop="express_code">
+            <el-select class="wp-200" size="small" v-model="form.express_code" placeholder="Vui lòng chọn">
               <el-option
                 v-for="item in source.express_company"
                 :key="item.code"
@@ -165,19 +191,19 @@
                 :value="item.code">
               </el-option>
             </el-select>
-            <a href="{{ admin_route('settings.index') }}?tab=tab-express-company" target="_blank" class="ms-2">{{ __('common.to_setting') }}</a>
+            <a href="{{ admin_route('settings.index') }}?tab=tab-express-company" target="_blank" class="ms-2">Đến cài đặt</a>
           </el-form-item>
-          <el-form-item label="{{ __('order.express_number') }}" v-if="form.status == 'shipped'" prop="express_number">
-            <el-input class="w-max-500" v-model="form.express_number" size="small" v-if="form.status == 'shipped'" placeholder="{{ __('order.express_number') }}"></el-input>
+          <el-form-item label="Mã vận đơn" v-if="form.status == 'shipped'" prop="express_number">
+            <el-input class="w-max-500" v-model="form.express_number" size="small" v-if="form.status == 'shipped'" placeholder="Mã vận đơn"></el-input>
           </el-form-item>
           {{-- <el-form-item label="{{ __('admin/order.notify') }}">
             <el-checkbox :true-label="1" :false-label="0" v-model="form.notify"></el-checkbox>
           </el-form-item> --}}
-          <el-form-item label="{{ __('order.comment') }}">
+          <el-form-item label="Ghi chú">
             <textarea class="form-control w-max-500" v-model="form.comment"></textarea>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="submitForm('form')">{{ __('order.submit_status') }}</el-button>
+            <el-button type="primary" @click="submitForm('form')">Cập nhật trạng thái</el-button>
           </el-form-item>
         @endif
       </el-form>
@@ -188,18 +214,18 @@
 
   @hookwrapper('admin.order.form.products')
   <div class="card mb-4">
-    <div class="card-header"><h6 class="card-title">{{ __('order.product_info') }}</h6></div>
+    <div class="card-header"><h6 class="card-title">Thông tin sản phẩm</h6></div>
     <div class="card-body">
       <div class="table-push">
         <table class="table ">
           <thead class="">
             <tr>
               <th>ID</th>
-              <th>{{ __('order.product_name') }}</th>
-              <th class="">{{ __('order.product_sku') }}</th>
-              <th>{{ __('order.product_price') }}</th>
-              <th class="">{{ __('order.product_quantity') }}</th>
-              <th class="text-end">{{ __('order.product_sub_price') }}</th>
+              <th>Tên sản phẩm</th>
+              <th class="">SKU</th>
+              <th>Giá</th>
+              <th class="">Số lượng</th>
+              <th class="text-end">Thành tiền</th>
             </tr>
           </thead>
           <tbody>
@@ -233,30 +259,30 @@
   </div>
   @endhookwrapper
 
-  @if ($order->comment)
+  @if ($orderComment)
     <div class="card mb-4">
-      <div class="card-header"><h6 class="card-title">{{ __('order.order_comment') }}</h6></div>
-      <div class="card-body">{{ $order->comment }}</div>
+      <div class="card-header"><h6 class="card-title">Ghi chú đơn hàng</h6></div>
+      <div class="card-body">{{ $orderComment }}</div>
     </div>
   @endif
 
-  @if ($order->orderPayments)
+  @if (false && $order->orderPayments)
     @hookwrapper('admin.order.form.payments')
     <div class="card mb-4">
-      <div class="card-header"><h6 class="card-title">{{ __('admin/order.payments_history') }}</h6></div>
+      <div class="card-header"><h6 class="card-title">Lịch sử thanh toán</h6></div>
       <div class="card-body">
         <div class="table-push">
           <table class="table">
             <thead class="">
               <tr>
-                <th>{{ __('admin/order.order_id') }}</th>
-                <th>{{ __('admin/order.text_transaction_id') }}</th>
-                <th>{{ __('admin/order.text_request') }}</th>
-                <th>{{ __('admin/order.text_response') }}</th>
-                <th>{{ __('admin/order.text_callback') }}</th>
-                <th>{{ __('admin/order.text_receipt') }}</th>
-                <th>{{ __('order.created_at') }}</th>
-                <th>{{ __('order.updated_at') }}</th>
+                <th>Mã đơn</th>
+                <th>Mã giao dịch</th>
+                <th>Yêu cầu</th>
+                <th>Phản hồi</th>
+                <th>Callback</th>
+                <th>Biên lai</th>
+                <th>Ngày tạo</th>
+                <th>Ngày cập nhật</th>
               </tr>
             </thead>
             <tbody>
@@ -269,7 +295,7 @@
                 <td>{{ $payment->callback }}</td>
                 <td>
                   @if ($payment->receipt)
-                  <a href="{{ image_origin($payment->receipt) }}" target="_blank">{{ __('admin/order.text_click_view') }}</a>
+                  <a href="{{ image_origin($payment->receipt) }}" target="_blank">Xem biên lai</a>
                   @endif
                 </td>
                 <td>{{ $payment->created_at }}</td>
@@ -284,18 +310,18 @@
     @endhookwrapper
   @endif
 
-  @if ($order->orderShipments->count())
+  @if (false && $order->orderShipments->count())
     @hookwrapper('admin.order.form.shipments')
     <div class="card mb-4">
-      <div class="card-header"><h6 class="card-title">{{ __('order.order_shipments') }}</h6></div>
+      <div class="card-header"><h6 class="card-title">Vận đơn</h6></div>
       <div class="card-body">
         <div class="table-push">
           <table class="table">
             <thead class="">
               <tr>
-                <th>{{ __('order.express_company') }}</th>
-                <th>{{ __('order.express_number') }}</th>
-                <th>{{ __('order.updated_at') }}</th>
+                <th>Đơn vị vận chuyển</th>
+                <th>Mã vận đơn</th>
+                <th>Ngày cập nhật</th>
               </tr>
             </thead>
             <tbody>
@@ -313,15 +339,15 @@
                 </td>
                 <td>
                   <div class="edit-show">{{ $ship->express_number }}</div>
-                  <input type="text" class="form-control edit-form express-number d-none" placeholder="{{ __('order.express_number') }}" value="{{ $ship->express_number }}">
+                  <input type="text" class="form-control edit-form express-number d-none" placeholder="Mã vận đơn" value="{{ $ship->express_number }}">
                 </td>
                 <td>
                   <div class="d-flex justify-content-between align-items-center">
                     {{ $ship->created_at }}
-                    <div class="btn btn-outline-primary btn-sm edit-shipment">{{ __('common.edit') }}</div>
+                    <div class="btn btn-outline-primary btn-sm edit-shipment">Sửa</div>
                     <div class="d-none shipment-tool">
-                      <div class="btn btn-primary btn-sm">{{ __('common.confirm') }}</div>
-                      <div class="btn btn-outline-secondary btn-sm">{{ __('common.cancel') }}</div>
+                      <div class="btn btn-primary btn-sm">Xác nhận</div>
+                      <div class="btn btn-outline-secondary btn-sm">Hủy</div>
                     </div>
                   </div>
                 </td>
@@ -331,7 +357,7 @@
             <tfoot>
               <tr>
                 <td colspan="3" class="text-end">
-                  <a href="#" class="btn btn-sm btn-outline-secondary add-express">{{ __('admin/order.add_express') }}</a>
+                  <a href="#" class="btn btn-sm btn-outline-secondary add-express">Thêm vận đơn</a>
                 </td>
               </tr>
             </tfoot>
@@ -344,21 +370,25 @@
 
   @hookwrapper('admin.order.form.history')
   <div class="card mb-4">
-    <div class="card-header"><h6 class="card-title">{{ __('order.action_history') }}</h6></div>
+    <div class="card-header"><h6 class="card-title">Lịch sử hoạt động</h6></div>
     <div class="card-body">
       <div class="table-push">
         <table class="table ">
           <thead class="">
             <tr>
-              <th>{{ __('order.history_status') }}</th>
-              <th>{{ __('order.history_comment') }}</th>
-              <th>{{ __('order.updated_at') }}</th>
+              <th>Trạng thái</th>
+              <th>Bình luận</th>
+              <th>Ngày cập nhật</th>
             </tr>
           </thead>
           <tbody>
             @foreach ($order->orderHistories as $orderHistory)
               <tr>
-                <td>{{ $orderHistory->status_format }}</td>
+                <td>
+                  <span class="badge {{ $statusClassMap[$orderHistory->status] ?? 'bg-secondary' }}">
+                    {{ $orderHistory->status_format }}
+                  </span>
+                </td>
                 <td>{{ $orderHistory->comment }}</td>
                 <td>{{ $orderHistory->created_at }}</td>
               </tr>
@@ -381,9 +411,9 @@
       e.preventDefault();
 
       if (!express_company) {
-        layer.alert('{{ __('admin/order.error_no_express_company') }}', {
-          title: '{{ __('common.text_hint') }}',
-          btn: ['{{ __('admin/order.to_add_express_company') }}'],
+        layer.alert('Vui lòng cấu hình đơn vị vận chuyển trước khi thêm vận đơn.', {
+          title: 'Lưu ý',
+          btn: ['Cài đặt đơn vị vận chuyển'],
           btn1: function(index, layero) {
             window.open('{{ admin_route('settings.index') }}?tab=tab-express-company');
           }
@@ -393,35 +423,35 @@
 
       let html = '<div class="px-3 pt-3 add-express-wrap">';
       html += '<div class="form-group mb-2">';
-      html += '<label for="express_company" class="form-label">{{ __('order.express_company') }}</label>';
+      html += '<label for="express_company" class="form-label">Đơn vị vận chuyển</label>';
       html += '<select class="form-select" id="express_company" aria-label="Default select example">';
-      html += '<option value="">{{ __('common.please_choose') }}</option>';
+      html += '<option value="">Vui lòng chọn</option>';
       express_company.forEach(item => {
         html += `<option value="${item.code}">${item.name}</option>`;
       });
       html += '</select>';
       html += '</div>';
       html += '<div class="form-group mb-2">';
-      html += '<label for="express_number" class="form-label">{{ __('order.express_number') }}</label>';
-      html += '<input type="text" class="form-control" id="express_number" placeholder="{{ __('order.express_number') }}">';
+      html += '<label for="express_number" class="form-label">Mã vận đơn</label>';
+      html += '<input type="text" class="form-control" id="express_number" placeholder="Mã vận đơn">';
       html += '</div>';
       html += '</div>';
 
       layer.open({
         type: 1,
-        title: '{{ __('admin/order.add_express') }}',
+        title: 'Thêm vận đơn',
         content: html,
         area: ['400px', '300px'],
-        btn: ['{{ __('common.cancel') }}', '{{ __('common.confirm') }}'],
+        btn: ['Hủy', 'Xác nhận'],
         btn2: function(index, layero) {
           const express_code = $('#express_company').val();
           const express_number = $('#express_number').val();
           if (!express_code) {
-            layer.msg('{{ __('common.error_required', ['name' => __('order.express_company')]) }}');
+            layer.msg('Vui lòng chọn đơn vị vận chuyển.');
             return false;
           }
           if (!express_number) {
-            layer.msg('{{ __('common.error_required', ['name' => __('order.express_number')]) }}');
+            layer.msg('Vui lòng nhập mã vận đơn.');
             return false;
           }
 
@@ -493,7 +523,7 @@
         },
 
         rules: {
-          status: [{required: true, message: '{{ __('admin/order.error_status') }}', trigger: 'blur'}, ],
+          status: [{required: true, message: 'Vui lòng chọn trạng thái', trigger: 'blur'}, ],
         },
 
         @hook('admin.order.form.vue.data')
@@ -503,7 +533,7 @@
         submitForm(form) {
           this.$refs[form].validate((valid) => {
             if (!valid) {
-              layer.msg('{{ __('common.error_form') }}',()=>{});
+              layer.msg('Vui lòng kiểm tra lại biểu mẫu.',()=>{});
               return;
             }
 

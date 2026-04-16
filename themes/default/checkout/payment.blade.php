@@ -3,7 +3,7 @@
 @section('body-class', 'page-payment')
 
 @section('content')
-  <x-shop-breadcrumb type="static" value="checkout.index" :text="[31231]" />
+  <x-shop-breadcrumb type="static" value="checkout.index" />
 
   <div class="container">
     @if (!is_mobile())
@@ -12,7 +12,8 @@
     </div>
     @endif
 
-    <div class="col-12">
+    <div class="row justify-content-center">
+      <div class="col-12 col-xl-10">
       <div class="card order-wrap border">
         <div class="card-body main-body">
           <div class="order-top">
@@ -42,6 +43,7 @@
 
           @hook('payment.footer')
         </div>
+      </div>
       </div>
     </div>
   </div>

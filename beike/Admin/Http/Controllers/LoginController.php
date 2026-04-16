@@ -36,6 +36,6 @@ class LoginController extends Controller
             return redirect(admin_route('home.index'));
         }
 
-        return redirect()->back()->with(['error' => trans('auth.failed')])->withInput();
+        return redirect()->back()->with(['error' => 'Tài khoản hoặc mật khẩu không đúng'])->withInput();
     }
 }

@@ -10,11 +10,11 @@
  */
 
 return [
-    'index'                     => 'Change password',
-    'new_password'              => 'New password',
-    'new_password_confirmation' => 'New password confirmation',
-    'new_password_err'          => 'Password inconsistency',
-    'old_password'              => 'Old password',
-    'origin_password_fail'      => 'Old password error',
-    'password_edit_success'     => 'Password changed successfully',
+    'index'                     => 'Đổi mật khẩu',
+    'new_password'              => 'Mật khẩu mới',
+    'new_password_confirmation' => 'Xác nhận mật khẩu mới',
+    'new_password_err'          => 'Hai lần nhập mật khẩu không khớp',
+    'old_password'              => 'Mật khẩu hiện tại',
+    'origin_password_fail'      => 'Mật khẩu hiện tại không đúng',
+    'password_edit_success'     => 'Đổi mật khẩu thành công',
 ];
