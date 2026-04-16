@@ -10,13 +10,18 @@
     "production": "mix --production"
   },
   "devDependencies": {
-    "axios": "^1.10.0",
-    "bootstrap": "^5.3.7",
-    "cross-env": "^10.1.0",
-    "laravel-mix": "^6.0.49",
-    "lodash": "^4.17.19",
-    "resolve-url-loader": "^4.0.0",
-    "sass": "^1.38.1",
-    "sass-loader": "^12.1.0"
+    "axios": "1.10.0",
+    "bootstrap": "5.3.7",
+    "cross-env": "7.0.3",
+    "laravel-mix": "6.0.49",
+    "lodash": "4.17.19",
+    "resolve-url-loader": "4.0.0",
+    "sass": "1.38.1",
+    "sass-loader": "12.1.0"
+  },
+  "overrides": {
+    "webpack": "5.106.1",
+    "webpack-cli": "4.10.0",
+    "webpackbar": "5.0.2"
   }
 }

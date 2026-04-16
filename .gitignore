@@ -22,6 +22,5 @@ yarn-error.log
 /.idea
 /.vscode
 mix-manifest.json
-package-lock.json
 dist
 /beike/ShopAPI
