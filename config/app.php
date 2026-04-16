@@ -256,7 +256,8 @@ return [
     ],
 
     'langs' => [
-        'de','en','es','fr','id','it','ja','ko','ru','zh_cn','zh_hk'
+        'en',
+        'zh_cn',
     ],
 
     'free_plugin_codes' => [
