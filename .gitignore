@@ -3,7 +3,6 @@
 /public/cache
 /public/hot
 /public/storage
-/public/upload/avatar
 /public/sitemap.xml
 /storage/*.key
 /storage/installed
