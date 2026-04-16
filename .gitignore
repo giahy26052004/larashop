@@ -4,8 +4,6 @@
 /public/hot
 /public/storage
 /public/upload/avatar
-/public/build/beike/*
-/public/install/css/*
 /public/sitemap.xml
 /storage/*.key
 /storage/installed
@@ -21,6 +19,5 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
-mix-manifest.json
 dist
 /beike/ShopAPI
