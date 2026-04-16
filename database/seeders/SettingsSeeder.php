@@ -68,7 +68,7 @@ class SettingsSeeder extends Seeder
             ["type" => "plugin", "space" => "flat_shipping", "name" => "type", "value" => "fixed", "json" => 0],
             ["type" => "plugin", "space" => "flat_shipping", "name" => "value", "value" => "30000", "json" => 0],
             ["type" => "system", "space" => "base", "name" => "default_customer_group_id", "value" => "1", "json" => 0],
-            ["type" => "plugin", "space" => "stripe", "name" => "status", "value" => "1", "json" => 0],
+            ["type" => "plugin", "space" => "stripe", "name" => "status", "value" => "0", "json" => 0],
             ["type" => "plugin", "space" => "latest_products", "name" => "status", "value" => "1", "json" => 0],
             ["type" => "plugin", "space" => "flat_shipping", "name" => "status", "value" => "1", "json" => 0],
             ["type" => "plugin", "space" => "paypal", "name" => "status", "value" => "1", "json" => 0],
